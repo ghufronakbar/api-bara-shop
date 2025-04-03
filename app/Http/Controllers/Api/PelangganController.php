@@ -51,7 +51,7 @@ class PelangganController extends Controller
         if ($checkCode) {
             return response()->json([
                 'message' => 'Pelanggan sudah terdaftar'
-            ]);
+            ], 400);
         }
 
         $jenis_kode = "Email";
@@ -63,7 +63,7 @@ class PelangganController extends Controller
         } else {
             return response()->json([
                 'message' => 'Kode tidak valid'
-            ]);
+            ], 400);
         }
 
         $validated = $validator->validated();
@@ -141,7 +141,7 @@ class PelangganController extends Controller
         if ($checkCode && $checkCode->id != $id) {
             return response()->json([
                 'message' => 'Pelanggan sudah terdaftar'
-            ]);
+            ], 400);
         }
 
         $jenis_kode = "Email";

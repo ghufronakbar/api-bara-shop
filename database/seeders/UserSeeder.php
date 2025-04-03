@@ -10,6 +10,11 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+
+        $check = User::count();
+        if ($check > 0) {
+            return;
+        }
         $users = [
             [
                 'nama' => 'Owner Satu',

@@ -100,9 +100,6 @@ class ProdukController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validator = Validator::make(['id' => $id] + $request->all(), [
@@ -141,16 +138,12 @@ class ProdukController extends Controller
 
         $this->logService->saveToLog($request, 'Produk', $produk->toArray());
 
-        // Menyimpan dan mengembalikan response
         return response()->json([
             'message' => 'Berhasil mengedit produk',
             'data' => $produk
         ], 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id, Request $request)
     {
         $validator = Validator::make(['id' => $id], [

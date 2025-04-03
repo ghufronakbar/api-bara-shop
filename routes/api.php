@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\InformasiController;
 use App\Http\Controllers\Api\PelangganController;
 use App\Http\Controllers\Api\PemasokController;
 use App\Http\Controllers\Api\ProdukController;
@@ -29,3 +30,4 @@ Route::middleware(['jwt.auth'])->get('/auth/check', [AuthController::class, 'che
 Route::middleware(['jwt.auth'])->apiResource('produk', ProdukController::class);
 Route::middleware(['jwt.auth'])->apiResource('pemasok', PemasokController::class);
 Route::middleware(['jwt.auth'])->apiResource('pelanggan', PelangganController::class);
+Route::middleware(['jwt.auth'])->apiResource('informasi', InformasiController::class);

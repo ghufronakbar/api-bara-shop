@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PemasokController;
 use App\Http\Controllers\Api\ProdukController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,3 +26,4 @@ Route::middleware(['jwt.auth'])->get('/auth/check', [AuthController::class, 'che
 
 
 Route::middleware(['jwt.auth'])->apiResource('produk', ProdukController::class);
+Route::middleware(['jwt.auth'])->apiResource('pemasok', PemasokController::class);

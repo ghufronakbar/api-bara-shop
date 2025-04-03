@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Produk;
+use App\Models\Pemasok;
 use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class ProdukController extends Controller
+class PemasokController extends Controller
 {
 
     protected $logService;
@@ -21,25 +21,24 @@ class ProdukController extends Controller
 
     public function index()
     {
-        $produk = Produk::withCount([])
+        $pemasok = Pemasok::withCount([])
             ->where('is_deleted', false)
             ->orderBy('nama', 'asc')
             ->get();
 
         return response()->json([
             'message' => 'OK',
-            'data' => $produk
+            'data' => $pemasok
         ]);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'kategori' => 'required|string',
             'nama' => 'required|string',
-            'harga' => 'required|numeric',
+            'alamat' => 'required|string',
+            'telepon' => 'required|string',
             'gambar' => 'nullable|string',
-            'deskripsi' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -51,24 +50,19 @@ class ProdukController extends Controller
 
         $validated = $validator->validated();
 
-        // Membuat produk baru
-        $produk = Produk::create([
-            'kategori' => $validated['kategori'],
+        $pemasok = Pemasok::create([
             'nama' => $validated['nama'],
-            'harga' => $validated['harga'],
-            'deskripsi' => $validated['deskripsi'],
-            'hpp' => 0,
-            'jumlah' => 0,
+            'alamat' => $validated['alamat'],
+            'telepon' => $validated['telepon'],
             'gambar' => $validated['gambar'] ?? null,
             'is_deleted' => false,
         ]);
 
-        $this->logService->saveToLog($request, 'Produk', $produk->toArray());
+        $this->logService->saveToLog($request, 'Pemasok', $pemasok->toArray());
 
-        // Menyimpan dan mengembalikan response
         return response()->json([
-            'message' => 'Berhasil menambahkan produk',
-            'data' => $produk
+            'message' => 'Berhasil menambahkan pemasok',
+            'data' => $pemasok
         ], 201);
     }
 
@@ -86,9 +80,9 @@ class ProdukController extends Controller
             ], 400);
         }
 
-        $produk = Produk::where('id', $id)->first();
+        $pemasok = Pemasok::where('id', $id)->first();
 
-        if (!$produk || $produk->is_deleted) {
+        if (!$pemasok || $pemasok->is_deleted) {
             return response()->json([
                 'message' => 'Data tidak ditemukan'
             ], 404);
@@ -96,22 +90,18 @@ class ProdukController extends Controller
 
         return response()->json([
             'message' => 'OK',
-            'data' => $produk
+            'data' => $pemasok
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validator = Validator::make(['id' => $id] + $request->all(), [
             'id' => 'required|uuid',
-            'kategori' => 'required|string',
             'nama' => 'required|string',
-            'harga' => 'required|numeric',
+            'alamat' => 'required|string',
+            'telepon' => 'nullable|string',
             'gambar' => 'nullable|string',
-            'deskripsi' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -121,9 +111,9 @@ class ProdukController extends Controller
             ], 400);
         }
 
-        $produk = Produk::where('id', $id)->select('id', 'is_deleted')->first();
+        $pemasok = Pemasok::where('id', $id)->select('id', 'is_deleted')->first();
 
-        if (!$produk || $produk->is_deleted) {
+        if (!$pemasok || $pemasok->is_deleted) {
             return response()->json([
                 'message' => 'Data tidak ditemukan'
             ], 404);
@@ -131,26 +121,21 @@ class ProdukController extends Controller
 
         $validated = $validator->validated();
 
-        $produk->update([
-            'kategori' => $validated['kategori'],
+        $pemasok->update([
             'nama' => $validated['nama'],
-            'harga' => $validated['harga'],
-            'deskripsi' => $validated['deskripsi'],
+            'alamat' => $validated['alamat'],
+            'telepon' => $validated['telepon'],
             'gambar' => $validated['gambar'] ?? null,
         ]);
 
-        $this->logService->saveToLog($request, 'Produk', $produk->toArray());
+        $this->logService->saveToLog($request, 'Pemasok', $pemasok->toArray());
 
-        // Menyimpan dan mengembalikan response
         return response()->json([
-            'message' => 'Berhasil mengedit produk',
-            'data' => $produk
+            'message' => 'Berhasil mengedit pemasok',
+            'data' => $pemasok
         ], 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id, Request $request)
     {
         $validator = Validator::make(['id' => $id], [
@@ -164,21 +149,21 @@ class ProdukController extends Controller
             ], 400);
         }
 
-        $produk = Produk::where('id', $id)->first();
+        $pemasok = Pemasok::where('id', $id)->first();
 
-        if (!$produk || $produk->is_deleted) {
+        if (!$pemasok || $pemasok->is_deleted) {
             return response()->json([
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
 
-        $produk->update(['is_deleted' => true]);
+        $pemasok->update(['is_deleted' => true]);
 
-        $this->logService->saveToLog($request, 'Produk', $produk->toArray());
+        $this->logService->saveToLog($request, 'Pemasok', $pemasok->toArray());
 
         return response()->json([
-            'message' => 'Berhasil menghapus produk',
-            'data' => $produk
+            'message' => 'Berhasil menghapus pemasok',
+            'data' => $pemasok
         ]);
     }
 }

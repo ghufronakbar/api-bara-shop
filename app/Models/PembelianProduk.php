@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+class PembelianProduk extends Model
+{
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $table = 'pembelian_produk';
+
+    protected $fillable = [
+        'id',
+        'jumlah',
+        'harga',
+        'total',
+        'deskripsi',
+        'produk_id',
+        'pemasok_id',
+        'is_deleted',
+    ];
+
+    protected static function booted()
+    {
+        static::creating(function ($pembelianProduk) {
+            if (empty($pembelianProduk->id)) {
+                $pembelianProduk->id = (string) Str::uuid();
+            }
+        });
+    }
+}

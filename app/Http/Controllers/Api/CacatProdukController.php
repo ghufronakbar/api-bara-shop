@@ -24,8 +24,15 @@ class CacatProdukController extends Controller
     {
         $cacatProduk = CacatProduk::withCount([])
             ->where('is_deleted', false)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
+
+        $produk = Produk::get();
+
+        foreach ($cacatProduk as $cacat) {
+            $filterProduk = $produk->where('id', $cacat->produk_id)->first();
+            $cacat->produk = $filterProduk ? $filterProduk->toArray() : null;
+        }
 
         return response()->json([
             'message' => 'OK',
@@ -101,6 +108,10 @@ class CacatProdukController extends Controller
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
+
+        $produk = Produk::where('id', $cacatProduk->produk_id)->first();
+
+        $cacatProduk->produk = $produk;
 
         return response()->json([
             'message' => 'OK',

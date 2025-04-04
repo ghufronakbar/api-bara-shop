@@ -65,7 +65,6 @@ class ProdukController extends Controller
 
         $this->logService->saveToLog($request, 'Produk', $produk->toArray());
 
-        // Menyimpan dan mengembalikan response
         return response()->json([
             'message' => 'Berhasil menambahkan produk',
             'data' => $produk

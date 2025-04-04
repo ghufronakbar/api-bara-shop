@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CacatProdukController;
 use App\Http\Controllers\Api\InformasiController;
 use App\Http\Controllers\Api\PelangganController;
 use App\Http\Controllers\Api\PemasokController;
+use App\Http\Controllers\Api\PembelianProdukController;
 use App\Http\Controllers\Api\ProdukController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,3 +34,4 @@ Route::middleware(['jwt.auth'])->apiResource('pemasok', PemasokController::class
 Route::middleware(['jwt.auth'])->apiResource('pelanggan', PelangganController::class);
 Route::middleware(['jwt.auth'])->apiResource('informasi', InformasiController::class);
 Route::middleware(['jwt.auth'])->apiResource('cacat-produk', CacatProdukController::class);
+Route::middleware(['jwt.auth'])->apiResource('pembelian-produk', PembelianProdukController::class);

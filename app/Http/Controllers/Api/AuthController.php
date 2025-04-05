@@ -29,9 +29,15 @@ class AuthController extends Controller
 
         // Cek email
         $user = User::where('email', $request->email)->first();
-        if (!$user) {
+        if (!$user || $user->is_deleted) {
             return response()->json([
                 'message' => 'Email tidak ditemukan'
+            ], 400);
+        }
+
+        if (!$user->is_confirmed) {
+            return response()->json([
+                'message' => 'Email belum diverifikasi'
             ], 400);
         }
 
@@ -78,7 +84,7 @@ class AuthController extends Controller
         $token = substr($authHeader, 7); // potong "Bearer "
 
         try {
-            $decoded = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key(env('JWT_SECRET'), 'HS256'));
+            $decoded = \Firebase\JWT\JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
 
             return response()->json([
                 'message' => 'OK',

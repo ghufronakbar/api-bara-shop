@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\EmailResetPassword;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -93,5 +96,49 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Semua kolom wajib diisi',
+                'errors' => $validator->errors(),
+            ], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || $user->is_deleted) {
+            return response()->json([
+                'message' => 'Email tidak ditemukan'
+            ], 400);
+        }
+
+        if (!$user->is_confirmed) {
+            return response()->json([
+                'message' => 'Email belum diverifikasi'
+            ], 400);
+        }
+
+        $password = Str::random(8);
+        $hashedPassword = Hash::make($password);
+
+        $user->password = $hashedPassword;
+        $user->save();
+
+        Mail::to($user->email)->send(new EmailResetPassword($user->nama, $password));
+
+        return response()->json([
+            'message' => 'Berhasil mereset password, silahkan cek email',
+            'data' => [
+                'email' => $user->email,
+                'password' => $password,
+            ]
+        ]);
     }
 }

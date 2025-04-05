@@ -7,6 +7,7 @@ use App\Http\Controllers\WhatsAppController;
 use App\Mail\EmailKirimPesan;
 use App\Models\Pelanggan;
 use App\Models\PesanTerkirim;
+use App\Models\User;
 use App\Services\LogService;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -27,10 +28,16 @@ class PesanController extends Controller
 
     public function index()
     {
-        $pesanTerkirim = PesanTerkirim::withCount([])
+        $pesanTerkirim = PesanTerkirim::withCount(["pelanggan"])
             ->where('is_deleted', false)
             ->orderBy('created_at', 'desc')
             ->get();
+
+        $user = User::get();
+
+        foreach ($pesanTerkirim as $pesan) {
+            $pesan->user = $user->where('id', $pesan->user_id)->first();
+        }
 
         return response()->json([
             'message' => 'OK',
@@ -130,7 +137,11 @@ class PesanController extends Controller
             ], 400);
         }
 
-        $pesanTerkirim = PesanTerkirim::where('id', $id)->first();
+        $pesanTerkirim = PesanTerkirim::withCount(["pelanggan"])->where('id', $id)->first();
+
+        $user = User::where('id', $pesanTerkirim->user_id)->first();
+
+        $pesanTerkirim->user = $user;
 
         if (!$pesanTerkirim || $pesanTerkirim->is_deleted) {
             return response()->json([

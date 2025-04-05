@@ -39,6 +39,8 @@ class Produk extends Model
         });
     }
 
-    // Relasi jika dibutuhkan bisa ditambahkan di sini
-    // public function pembelian_produk() { ... }
+    // public function pemesanan()
+    // {
+    //     return $this->hasMany(Pemesanan::class);
+    // }
 }

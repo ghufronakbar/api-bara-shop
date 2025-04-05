@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AkunController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CacatProdukController;
 use App\Http\Controllers\Api\InformasiController;
+use App\Http\Controllers\Api\LogAksiController;
 use App\Http\Controllers\Api\PelangganController;
 use App\Http\Controllers\Api\PemasokController;
 use App\Http\Controllers\Api\PembelianProdukController;
@@ -42,6 +43,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('pembelian-produk', PembelianProdukController::class);
     Route::apiResource('pengguna', PenggunaController::class);
     Route::apiResource('pesan', PesanController::class);
+    Route::apiResource('log-aksi', LogAksiController::class);
     Route::group(['prefix' => 'akun'], function () {
         Route::get('/', [AkunController::class, 'index']);
         Route::put('/', [AkunController::class, 'editProfile']);

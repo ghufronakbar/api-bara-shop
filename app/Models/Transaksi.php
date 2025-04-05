@@ -14,6 +14,7 @@ class Transaksi extends Model
 
     protected $casts = [
         'jumlah' => 'float',
+        'detail' => 'array',
     ];
 
     protected $fillable = [

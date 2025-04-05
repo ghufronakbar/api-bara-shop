@@ -95,7 +95,6 @@ class PenggunaController extends Controller
         ], 201);
     }
 
-
     public function show(string $id)
     {
         $validator = Validator::make(['id' => $id], [

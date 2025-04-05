@@ -11,6 +11,10 @@ class LogAksi extends Model
 
     protected $table = 'log_aksi';
 
+    protected $casts = [
+        'detail' => 'array',
+    ];
+
     protected $fillable = [
         'id',
         'deskripsi',

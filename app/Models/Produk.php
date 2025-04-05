@@ -12,6 +12,12 @@ class Produk extends Model
 
     protected $table = 'produk';
 
+    protected $casts = [
+        'jumlah' => 'float',
+        'harga' => 'float',
+        'hpp' => 'float',
+    ];
+
     protected $fillable = [
         'id',
         'nama',

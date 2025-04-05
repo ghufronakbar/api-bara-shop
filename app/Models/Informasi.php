@@ -12,6 +12,11 @@ class Informasi extends Model
 
     protected $table = 'informasi';
 
+    protected $casts = [
+        'pajak' => 'float',
+        'diskon' => 'float',
+    ];
+
     protected $fillable = [
         'id',
         'pajak',

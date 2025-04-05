@@ -12,6 +12,10 @@ class CacatProduk extends Model
 
     protected $table = 'cacat_produk';
 
+    protected $casts = [
+        'jumlah' => 'float',
+    ];
+
     protected $fillable = [
         'id',
         'jumlah',

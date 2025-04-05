@@ -12,6 +12,12 @@ class PembelianProduk extends Model
 
     protected $table = 'pembelian_produk';
 
+    protected $casts = [
+        'jumlah' => 'float',
+        'harga' => 'float',
+        'total' => 'float',
+    ];
+
     protected $fillable = [
         'id',
         'jumlah',

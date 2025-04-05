@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ItemPesanan;
+use App\Models\PembelianProduk;
 use App\Models\Produk;
 use App\Services\LogService;
 use Illuminate\Http\Request;
@@ -21,10 +23,15 @@ class ProdukController extends Controller
 
     public function index()
     {
-        $produk = Produk::withCount([])
-            ->where('is_deleted', false)
+        $produk = Produk::where('is_deleted', false)
             ->orderBy('nama', 'asc')
             ->get();
+
+        $item_pesanan = ItemPesanan::get();
+
+        foreach ($produk as $p) {
+            $p->total_terjual = $item_pesanan->where('produk_id', $p->id)->sum('jumlah');
+        }
 
         return response()->json([
             'message' => 'OK',
@@ -92,6 +99,13 @@ class ProdukController extends Controller
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
+        $item_pesanan = ItemPesanan::where('produk_id', $produk->id)->get();
+
+        $produk->total_terjual = $item_pesanan->sum('jumlah');
+        $produk->item_pesanan = $item_pesanan;
+
+        $pembelian = PembelianProduk::where('produk_id', $produk->id)->get();
+        $produk->pembelian_produk = $pembelian;
 
         return response()->json([
             'message' => 'OK',

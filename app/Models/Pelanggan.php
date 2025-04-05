@@ -28,4 +28,9 @@ class Pelanggan extends Model
             }
         });
     }
+
+    public function pesanan()
+    {
+        return $this->hasMany(Pesanan::class);
+    }
 }

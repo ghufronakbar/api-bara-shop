@@ -43,4 +43,14 @@ class Pesanan extends Model
     {
         return $this->belongsTo(Pelanggan::class);
     }
+
+    public function item_pesanan()
+    {
+        return $this->hasMany(ItemPesanan::class);
+    }
+
+    public function transaksi()
+    {
+        return $this->hasOne(Transaksi::class);
+    }
 }

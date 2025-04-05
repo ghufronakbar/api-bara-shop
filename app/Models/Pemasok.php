@@ -29,4 +29,9 @@ class Pemasok extends Model
             }
         });
     }
+
+    public function pembelian_produk()
+    {
+        return $this->hasMany(PembelianProduk::class);
+    }
 }

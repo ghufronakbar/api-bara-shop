@@ -24,9 +24,6 @@ class LogAksiController extends Controller
 
         $token = substr($authHeader, 7); // potong "Bearer "
 
-
-
-
         try {
 
             $decoded = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key(env('JWT_SECRET'), 'HS256'));

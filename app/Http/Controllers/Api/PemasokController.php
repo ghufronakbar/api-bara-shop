@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pemasok;
+use App\Models\PembelianProduk;
 use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -87,6 +88,9 @@ class PemasokController extends Controller
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
+
+        $pembelian = PembelianProduk::where('pemasok_id', $pemasok->id)->get();
+        $pemasok->pembelian_produk = $pembelian;
 
         return response()->json([
             'message' => 'OK',

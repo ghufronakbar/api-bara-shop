@@ -22,8 +22,7 @@ class CacatProdukController extends Controller
 
     public function index()
     {
-        $cacatProduk = CacatProduk::withCount([])
-            ->where('is_deleted', false)
+        $cacatProduk = CacatProduk::where('is_deleted', false)
             ->orderBy('created_at', 'desc')
             ->get();
 

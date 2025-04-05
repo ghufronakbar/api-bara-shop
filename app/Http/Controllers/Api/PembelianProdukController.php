@@ -29,10 +29,14 @@ class PembelianProdukController extends Controller
             ->get();
 
         $produk = Produk::get();
+        $pemasok = Pemasok::get();
 
         foreach ($pembelianProduk as $pembelian) {
             $filterProduk = $produk->where('id', $pembelian->produk_id)->first();
             $pembelian->produk = $filterProduk ? $filterProduk->toArray() : null;
+
+            $filterPemasok = $pemasok->where('id', $pembelian->pemasok_id)->first();
+            $pembelian->pemasok = $filterPemasok ? $filterPemasok->toArray() : null;
         }
 
         return response()->json([
@@ -149,8 +153,10 @@ class PembelianProdukController extends Controller
         }
 
         $produk = Produk::where('id', $pembelianProduk->produk_id)->first();
-
         $pembelianProduk->produk = $produk;
+
+        $pemasok = Pemasok::where('id', $pembelianProduk->pemasok_id)->first();
+        $pembelianProduk->pemasok = $pemasok;
 
         return response()->json([
             'message' => 'OK',

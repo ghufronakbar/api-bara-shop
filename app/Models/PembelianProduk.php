@@ -37,4 +37,14 @@ class PembelianProduk extends Model
             }
         });
     }
+
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class);
+    }
+
+    public function pemasok()
+    {
+        return $this->belongsTo(Pemasok::class);
+    }
 }

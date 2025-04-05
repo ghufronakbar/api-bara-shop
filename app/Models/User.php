@@ -38,4 +38,9 @@ class User extends Authenticatable
             }
         });
     }
+
+    public function log_aksi()
+    {
+        return $this->hasMany(LogAksi::class);
+    }
 }

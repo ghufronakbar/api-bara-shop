@@ -39,8 +39,8 @@ class Produk extends Model
         });
     }
 
-    // public function pemesanan()
-    // {
-    //     return $this->hasMany(Pemesanan::class);
-    // }
+    public function item_pesanan()
+    {
+        return $this->hasMany(ItemPesanan::class);
+    }
 }

@@ -73,7 +73,6 @@ class PenggunaController extends Controller
         $hashedPassword = bcrypt($password);
 
 
-        // Mengirim email
 
         // Membuat user baru
         $user = User::create([
@@ -85,6 +84,7 @@ class PenggunaController extends Controller
             'is_deleted' => false,
         ]);
 
+        // Mengirim email
         Mail::to($validated['email'])->send(new EmailPembuatan($user->nama, $password));
 
         $this->logService->saveToLog($request, 'User', $user->toArray());

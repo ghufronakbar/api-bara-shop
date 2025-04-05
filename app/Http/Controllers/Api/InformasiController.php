@@ -4,11 +4,21 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Informasi;
+use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class InformasiController extends Controller
 {
+
+
+    protected $logService;
+
+    public function __construct(LogService $logService)
+    {
+        $this->logService = $logService;
+    }
+
     public function index()
     {
         $informasi = Informasi::first();
@@ -41,6 +51,8 @@ class InformasiController extends Controller
         } else {
             $informasi->update($validated);
         }
+
+        $this->logService->saveToLog($request, 'Informasi', $informasi->toArray());
 
         return response()->json([
             'message' => 'Berhasil mengedit informasi',

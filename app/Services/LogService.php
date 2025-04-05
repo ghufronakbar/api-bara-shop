@@ -57,22 +57,22 @@ class LogService
                 case 'User':
                     $modelDesc = 'pengguna';
                     break;
-                case 'Customer':
+                case 'Pelanggan':
                     $modelDesc = 'customer';
                     break;
-                case 'Product':
+                case 'Produk':
                     $modelDesc = 'produk';
                     break;
-                case 'ProductPurchase':
+                case 'PembelianProduk':
                     $modelDesc = 'pembelian produk';
                     break;
-                case 'Order':
+                case 'Pesanan':
                     $modelDesc = 'pesanan';
                     break;
-                case 'ProductDefect':
-                    $modelDesc = 'defeksi produk';
+                case 'CacatProduk':
+                    $modelDesc = 'kerusakan produk';
                     break;
-                case 'Information':
+                case 'Informasi':
                     $modelDesc = 'informasi';
                     break;
             }
@@ -84,7 +84,14 @@ class LogService
                 throw new \Exception('Unauthorized');
             }
 
-            $description = "$user->nama ({$user->peran}) {$actionDesc} {$modelDesc} dengan id {$detail['id']}";
+            $description = sprintf(
+                '%s (%s) %s %s dengan id %s',
+                $user->nama,
+                $user->peran,
+                $model === 'Informasi' ? 'mengedit' : $actionDesc,
+                $modelDesc,
+                $detail['id']
+            );
 
             // Simpan log
             LogAksi::create([

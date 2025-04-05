@@ -45,8 +45,10 @@ class AuthController extends Controller
         // Payload JWT
         $payload = [
             'id' => $user->id,
+            'nama' => $user->nama,
+            'gambar' => $user->gambar,
             'email' => $user->email,
-            'role' => $user->peran,
+            'peran' => $user->peran,
             'exp' => now()->addDays(1)->timestamp,
         ];
 
@@ -56,8 +58,10 @@ class AuthController extends Controller
             'message' => 'Login berhasil!',
             'data' => [
                 'id' => $user->id,
+                'nama' => $user->nama,
                 'email' => $user->email,
-                'role' => $user->peran,
+                'gambar' => $user->gambar,
+                'peran' => $user->peran,
                 'token' => $token,
             ]
         ]);

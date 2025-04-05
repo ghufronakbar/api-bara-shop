@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AkunController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CacatProdukController;
 use App\Http\Controllers\Api\InformasiController;
@@ -25,13 +26,21 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::middleware(['jwt.auth'])->get('/auth/check', [AuthController::class, 'check']);
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::middleware(['jwt.auth'])->get('/check', [AuthController::class, 'check']);
+});
 
-
-Route::middleware(['jwt.auth'])->apiResource('produk', ProdukController::class);
-Route::middleware(['jwt.auth'])->apiResource('pemasok', PemasokController::class);
-Route::middleware(['jwt.auth'])->apiResource('pelanggan', PelangganController::class);
-Route::middleware(['jwt.auth'])->apiResource('informasi', InformasiController::class);
-Route::middleware(['jwt.auth'])->apiResource('cacat-produk', CacatProdukController::class);
-Route::middleware(['jwt.auth'])->apiResource('pembelian-produk', PembelianProdukController::class);
+Route::group(['middleware' => ['jwt.auth']], function () {
+    Route::apiResource('produk', ProdukController::class);
+    Route::apiResource('pemasok', PemasokController::class);
+    Route::apiResource('pelanggan', PelangganController::class);
+    Route::apiResource('informasi', InformasiController::class);
+    Route::apiResource('cacat-produk', CacatProdukController::class);
+    Route::apiResource('pembelian-produk', PembelianProdukController::class);
+    Route::group(['prefix' => 'akun'], function () {
+        Route::get('/', [AkunController::class, 'index']);
+        Route::put('/', [AkunController::class, 'editProfile']);
+        Route::patch('/', [AkunController::class, 'editPassword']);
+    });
+});

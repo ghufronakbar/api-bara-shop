@@ -33,7 +33,11 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('pengguna', PenggunaController::class);
     Route::apiResource('pesan', PesanController::class);
     Route::apiResource('log-aksi', LogAksiController::class);
-    Route::apiResource('pesanan', PesananController::class);
+    Route::group(['prefix' => 'pesanan'], function () {
+        Route::get('/', [PesananController::class, 'index']);
+        Route::post('/', [PesananController::class, 'store']);
+        Route::post('/nota', [PesananController::class, 'kirimNota']);
+    });
     Route::group(['prefix' => 'akun'], function () {
         Route::get('/', [AkunController::class, 'index']);
         Route::put('/', [AkunController::class, 'editProfile']);

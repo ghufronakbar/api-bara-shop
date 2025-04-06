@@ -16,6 +16,7 @@ class PembelianProduk extends Model
         'jumlah' => 'float',
         'harga' => 'float',
         'total' => 'float',
+        'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [

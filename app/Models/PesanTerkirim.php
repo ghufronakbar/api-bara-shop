@@ -12,6 +12,10 @@ class PesanTerkirim extends Model
 
     protected $table = 'pesan_terkirim';
 
+    protected $casts = [
+        'is_deleted' => 'boolean',
+    ];
+
     protected $fillable = [
         'id',
         'subjek',

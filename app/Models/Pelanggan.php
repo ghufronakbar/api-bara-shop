@@ -12,6 +12,10 @@ class Pelanggan extends Model
 
     protected $table = 'pelanggan';
 
+    protected $casts = [
+        'is_deleted' => 'boolean',
+    ];
+
     protected $fillable = [
         'id',
         'nama',

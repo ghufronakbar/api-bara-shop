@@ -14,6 +14,7 @@ class CacatProduk extends Model
 
     protected $casts = [
         'jumlah' => 'float',
+        'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [

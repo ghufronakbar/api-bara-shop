@@ -15,6 +15,7 @@ class Informasi extends Model
     protected $casts = [
         'pajak' => 'float',
         'diskon' => 'float',
+        'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [

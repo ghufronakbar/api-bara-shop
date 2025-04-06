@@ -17,6 +17,9 @@ class Pesanan extends Model
         'total_sementara' => 'float',
         'diskon' => 'float',
         'pajak' => 'float',
+        'persentase_diskon' => 'float',
+        'persentase_pajak' => 'float',
+        'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
@@ -27,6 +30,8 @@ class Pesanan extends Model
         'pajak',
         'deskripsi',
         'pelanggan_id',
+        'persentase_diskon',
+        'persentase_pajak',
         'is_deleted',
     ];
 

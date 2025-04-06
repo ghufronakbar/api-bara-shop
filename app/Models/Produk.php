@@ -16,6 +16,7 @@ class Produk extends Model
         'jumlah' => 'float',
         'harga' => 'float',
         'hpp' => 'float',
+        'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [

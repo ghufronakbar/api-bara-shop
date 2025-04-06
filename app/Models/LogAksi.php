@@ -13,6 +13,7 @@ class LogAksi extends Model
 
     protected $casts = [
         'detail' => 'array',
+        'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [

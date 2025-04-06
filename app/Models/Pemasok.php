@@ -12,6 +12,10 @@ class Pemasok extends Model
 
     protected $table = 'pemasok';
 
+    protected $casts = [
+        'is_deleted' => 'boolean',
+    ];
+
     protected $fillable = [
         'id',
         'nama',

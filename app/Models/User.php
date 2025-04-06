@@ -16,6 +16,10 @@ class User extends Authenticatable
 
     protected $table = 'users';
 
+    protected $casts = [
+        'is_deleted' => 'boolean',
+    ];
+
     protected $fillable = [
         'id',
         'nama',

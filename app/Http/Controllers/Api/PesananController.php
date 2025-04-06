@@ -160,6 +160,7 @@ class PesananController extends Controller
             }
 
             $persentase_diskon = $request->kode ? $informasi->diskon / 100 : 0;
+
             $diskon = $persentase_diskon * $total_sementara;
             $harga_sebelum_pajak = $total_sementara - $diskon;
             $pajak = ($informasi->pajak / 100) * $harga_sebelum_pajak;
@@ -171,6 +172,8 @@ class PesananController extends Controller
                 'total_akhir' => $total_akhir,
                 'diskon' => $diskon,
                 'pajak' => $pajak,
+                'persentase_diskon' => $informasi->diskon,
+                'persentase_pajak' => $informasi->pajak,
                 'pelanggan_id' => $pelanggan_id
             ]);
 
@@ -264,9 +267,7 @@ class PesananController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+
     public function show(string $id)
     {
         Config::$serverKey = config('midtrans.server_key');
@@ -348,11 +349,13 @@ class PesananController extends Controller
     /**
      * Send Nota Pesanan
      */
-    public function update(Request $request, string $id)
+    public function kirimNota(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required|uuid',
         ]);
+
+        Log::info($request->all());
 
         if ($validator->fails()) {
             return response()->json([
@@ -361,7 +364,7 @@ class PesananController extends Controller
             ], 400);
         }
 
-        $pesanan = Pesanan::with(["item_pesanan", "item_pesanan.produk", "transaksi", 'pelanggan'])->where('id', $id)->first();
+        $pesanan = Pesanan::with(["item_pesanan", "item_pesanan.produk", "transaksi", 'pelanggan'])->where('id', $request->id)->first();
         if (!$pesanan) {
             return response()->json([
                 'message' => 'Data tidak ditemukan',
@@ -370,17 +373,23 @@ class PesananController extends Controller
 
         if ($pesanan->status == "Pending") {
             return response()->json([
-                'message' => 'Pesanan belum selesai',
+                'message' => 'Pesanan belum dibayar',
             ], 400);
         }
-        $informasi = Informasi::first();
+
+        if (!$pesanan->pelanggan) {
+            return response()->json([
+                'message' => 'Tidak bisa mengirim nota, pelanggan belum terdaftar',
+            ], 400);
+        }
+
         $pelanggan = $pesanan->pelanggan;
         $nota = [
             'pesanan_id' => $pesanan->id,
             'tanggal' => $pesanan->created_at,
-            'persentase_diskon' => $informasi->diskon,
+            'persentase_diskon' => $pesanan->persentase_diskon,
             'diskon' => $pesanan->diskon,
-            'persentase_pajak' => $informasi->pajak,
+            'persentase_pajak' => $pesanan->persentase_pajak,
             'pajak' => $pesanan->pajak,
             'total_akhir' => $pesanan->total_akhir
         ];
@@ -395,6 +404,7 @@ class PesananController extends Controller
                 'total' => $item->total,
             ];
         }
+
         if ($pelanggan && !$pelanggan->is_deleted) {
             if ($pelanggan->jenis_kode == "Email") {
                 Mail::to($pelanggan->kode)->send(new EmailNotaPesanan($nota, $item_nota));
@@ -405,6 +415,13 @@ class PesananController extends Controller
                 $whatsapp->sendNotaPesanan($pelanggan->kode, $nota, $item_nota);
             }
         }
+
+        $to = $pelanggan->jenis_kode == "Email" ? "email" : "nomor";
+
+        return response()->json([
+            'message' => 'Berhasil mengirim nota ke ' . $to . ' pelanggan',
+            'data' => $pesanan
+        ]);
     }
 
     /**

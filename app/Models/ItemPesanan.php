@@ -16,6 +16,7 @@ class ItemPesanan extends Model
         'jumlah' => 'float',
         'harga' => 'float',
         'total' => 'float',
+        'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [

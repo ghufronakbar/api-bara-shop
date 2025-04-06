@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -32,9 +31,9 @@ class WhatsAppController extends Controller
 
             // Proses response
             if ($response->successful()) {
-                Log::info("Message sent successfully to {$phone}");
+                // Log::info("Message sent successfully to {$phone}");
             } else {
-                Log::error("Error sending WhatsApp message to {$phone}: {$response->body()}");
+                // Log::error("Error sending WhatsApp message to {$phone}: {$response->body()}");
             }
         }
     }
@@ -80,9 +79,9 @@ class WhatsAppController extends Controller
 
         // Proses response
         if ($response->successful()) {
-            Log::info("Message sent successfully to {$phone}");
+            // Log::info("Message sent successfully to {$phone}");
         } else {
-            Log::error("Error sending WhatsApp message to {$phone}: {$response->body()}");
+            // Log::error("Error sending WhatsApp message to {$phone}: {$response->body()}");
         }
     }
 }

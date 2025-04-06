@@ -13,7 +13,6 @@ use App\Models\Produk;
 use App\Services\LogService;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Midtrans\Config;
@@ -354,8 +353,6 @@ class PesananController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required|uuid',
         ]);
-
-        Log::info($request->all());
 
         if ($validator->fails()) {
             return response()->json([

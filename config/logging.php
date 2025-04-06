@@ -54,7 +54,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['null'],
             'ignore_exceptions' => false,
         ],
 
@@ -119,7 +119,7 @@ return [
         ],
 
         'null' => [
-            'driver' => 'monolog',
+            'driver' => 'null',
             'handler' => NullHandler::class,
         ],
 

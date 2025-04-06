@@ -7,7 +7,7 @@ use App\Models\LogAksi;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class LogAksiController extends Controller
@@ -48,8 +48,8 @@ class LogAksiController extends Controller
                 }
             };
 
-            Log::info('Log Aksi', ['querySemua' => $request->query('semua')]);
-            Log::info('Log Aksi', ['decoded role' => $decoded->peran]);
+            // Log::info('Log Aksi', ['querySemua' => $request->query('semua')]);
+            // Log::info('Log Aksi', ['decoded role' => $decoded->peran]);
 
             if ($decoded->peran === 'ManagerOperational' || $decoded->peran === 'Cashier') {
                 $logAksi = $logAksi->where('user_id', $decoded->id);

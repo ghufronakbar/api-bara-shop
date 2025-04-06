@@ -424,11 +424,68 @@ class PesananController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function webhook(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'transaction_status' => 'required|string',
+            'order_id' => 'required|string|uuid',
+            'fraud_status' => 'required|string',
+        ]);
+
+        $pesanan = Pesanan::with(["item_pesanan", "item_pesanan.produk", "transaksi", 'pelanggan'])->where('id', $request->order_id)->first();
+
+        if (!$pesanan) {
+            return response()->json([
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
+
+        if (
+            ($request->transaction_status == "capture" && $request->fraud_status == "accept") ||
+            $request->transaction_status == "settlement"
+        ) {
+            $pesanan->transaksi()->update([
+                'status' => "Success",
+                'detail' => json_encode($request->all())
+            ]);
+
+            $pelanggan = $pesanan->pelanggan;
+            $nota = [
+                'pesanan_id' => $pesanan->id,
+                'tanggal' => $pesanan->created_at,
+                'persentase_diskon' => $pesanan->persentase_diskon,
+                'diskon' => $pesanan->diskon,
+                'persentase_pajak' => $pesanan->persentase_pajak,
+                'pajak' => $pesanan->pajak,
+                'total_akhir' => $pesanan->total_akhir
+            ];
+
+            $item_nota = [];
+
+            foreach ($pesanan->item_pesanan as $item) {
+                $item_nota[] = [
+                    'produk' => $item->produk->nama,
+                    'jumlah' => $item->jumlah,
+                    'harga' => $item->harga,
+                    'total' => $item->total,
+                ];
+            }
+
+            if ($pelanggan && !$pelanggan->is_deleted) {
+                if ($pelanggan->jenis_kode == "Email") {
+                    Mail::to($pelanggan->kode)->send(new EmailNotaPesanan($nota, $item_nota));
+                }
+
+                if ($pelanggan->jenis_kode == "Phone") {
+                    $whatsapp = new WhatsAppController();
+                    $whatsapp->sendNotaPesanan($pelanggan->kode, $nota, $item_nota);
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'OK',
+            'data' => $pesanan
+        ]);
     }
 }

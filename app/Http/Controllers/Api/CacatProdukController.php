@@ -193,7 +193,9 @@ class CacatProdukController extends Controller
             ], 404);
         }
 
-        $checkCacatProduk->update(['is_deleted' => true]);
+        CacatProduk::where('id', $id)->update([
+            'is_deleted' => true
+        ]);
 
         $newAmount = $checkCacatProduk->produk_jumlah + $checkCacatProduk->cacat_jumlah;
 

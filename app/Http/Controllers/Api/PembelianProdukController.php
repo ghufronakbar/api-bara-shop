@@ -279,7 +279,9 @@ class PembelianProdukController extends Controller
             ], 404);
         }
 
-        $pembelianProduk->update(['is_deleted' => true]);
+        PembelianProduk::where('id', $id)->update([
+            'is_deleted' => true
+        ]);
 
         // Ambil data pembelian produk sebelumnya untuk menghitung HPP dan jumlah total
         $pembelianProduks = PembelianProduk::where('produk_id', $pembelianProduk->produk_id)

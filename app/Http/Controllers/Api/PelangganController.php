@@ -87,17 +87,17 @@ class PelangganController extends Controller
     public function show(string $id)
     {
         $validator = Validator::make(['id' => $id], [
-            'id' => 'required|uuid',
+            'id' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Id tidak valid',
+                'message' => 'Kode tidak valid',
                 'errors' => $validator->errors(),
             ], 400);
         }
 
-        $pelanggan = Pelanggan::where('id', $id)->first();
+        $pelanggan = Pelanggan::where('kode', $id)->first();
 
         if (!$pelanggan || $pelanggan->is_deleted) {
             return response()->json([

@@ -36,6 +36,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::group(['prefix' => 'pesanan'], function () {
         Route::get('/', [PesananController::class, 'index']);
         Route::post('/', [PesananController::class, 'store']);
+        Route::get('/{id}', [PesananController::class, 'show']);
         Route::post('/nota', [PesananController::class, 'kirimNota']);
         Route::post('/notifikasi', [PesananController::class, 'webhook']);
     });

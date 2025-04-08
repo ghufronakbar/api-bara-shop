@@ -30,7 +30,7 @@ class PesananController extends Controller
 
     public function index()
     {
-        $pesanan = Pesanan::with(["item_pesanan", "item_pesanan.produk", "transaksi", 'pelanggan'])->get();
+        $pesanan = Pesanan::with(["item_pesanan", "item_pesanan.produk", "transaksi", 'pelanggan'])->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'message' => 'OK',

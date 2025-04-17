@@ -25,11 +25,21 @@ class PeranController extends Controller
      */
     public function index()
     {
-        $perans = Peran::whereHas('users', function ($query) {
-            $query->where('is_deleted', false);
-        })
+        $perans = Peran::where('is_deleted', false)
             ->orderBy('nama', 'asc')
             ->get();
+
+        $users = User::where('is_deleted', false)->get();
+
+        foreach ($perans as $peran) {
+            $peran->count_users = $users->where('peran_id', $peran->id)->count();
+            $peran->users = [];
+            foreach ($users as $user) {
+                if ($user->peran_id === $peran->id) {
+                    $peran->users[] = $user;
+                }
+            }
+        }
 
         return response()->json([
             'message' => 'OK',
@@ -126,6 +136,17 @@ class PeranController extends Controller
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
+
+        $users = User::where('is_deleted', false)->get();
+
+        $peran->count_users = $users->where('peran_id', $peran->id)->count();
+        $peran->users = [];
+        foreach ($users as $user) {
+            if ($user->peran_id === $peran->id) {
+                $peran->users[] = $user;
+            }
+        }
+
 
         return response()->json([
             'message' => 'OK',

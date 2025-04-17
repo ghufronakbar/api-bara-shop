@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\EmailPembuatan;
 use App\Mail\EmailPenghapusan;
 use App\Mail\EmailPeranBaru;
+use App\Models\Peran;
 use App\Models\User;
 use App\Services\LogService;
 use Illuminate\Http\Request;
@@ -41,7 +42,7 @@ class PenggunaController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email',
             'nama' => 'required|string',
-            'peran' => 'required|string',
+            'peran_id' => 'required|string|uuid',
         ]);
 
         if ($validator->fails()) {
@@ -61,11 +62,12 @@ class PenggunaController extends Controller
             ], 400);
         }
 
-        $validPerans = ['Owner', 'Admin', 'ManagerOperational', 'Cashier'];
 
-        if (!in_array($validated['peran'], $validPerans)) {
+        $checkPeran = Peran::where('id', $validated['peran_id'])->first();
+
+        if (!$checkPeran || $checkPeran->is_deleted) {
             return response()->json([
-                'message' => 'Peran tidak valid'
+                'message' => 'Peran tidak ditemukan'
             ], 400);
         }
 
@@ -79,6 +81,7 @@ class PenggunaController extends Controller
             'nama' => $validated['nama'],
             'email' => $validated['email'],
             'peran' => $validated['peran'],
+            'peran_id' => $validated['peran_id'],
             'password' => $hashedPassword,
             'is_deleted' => false,
         ]);
@@ -107,7 +110,7 @@ class PenggunaController extends Controller
             ], 400);
         }
 
-        $user = User::where('id', $id)->first();
+        $user = User::with('peran')->where('id', $id)->first();
 
         if (!$user || $user->is_deleted) {
             return response()->json([
@@ -125,7 +128,7 @@ class PenggunaController extends Controller
     {
         $validator = Validator::make(['id' => $id] + $request->all(), [
             'id' => 'required|uuid',
-            'peran' => 'required|string',
+            'peran_id' => 'required|string|uuid',
         ]);
 
         if ($validator->fails()) {
@@ -137,11 +140,11 @@ class PenggunaController extends Controller
 
         $validated = $validator->validated();
 
-        $validPerans = ['Owner', 'Admin', 'ManagerOperational', 'Cashier'];
+        $checkPeran = Peran::where('id', $validated['peran_id'])->first();
 
-        if (!in_array($validated['peran'], $validPerans)) {
+        if (!$checkPeran || $checkPeran->is_deleted) {
             return response()->json([
-                'message' => 'Peran tidak valid'
+                'message' => 'Peran tidak ditemukan'
             ], 400);
         }
 

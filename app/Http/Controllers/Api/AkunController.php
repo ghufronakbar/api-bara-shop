@@ -32,7 +32,7 @@ class AkunController extends Controller
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
-            $user = User::find($decoded->id);
+            $user = User::with('peran')->find($decoded->id);
 
             if (!$user) {
                 return response()->json(['message' => 'Unauthorized'], 401);
@@ -99,7 +99,7 @@ class AkunController extends Controller
                 'nama' => $user->nama,
                 'email' => $user->email,
                 'gambar' => $user->gambar,
-                'role' => $user->peran,
+                'peran' => $user->peran,
                 'exp' => now()->addDays(1)->timestamp,
             ];
 

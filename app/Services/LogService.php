@@ -72,14 +72,19 @@ class LogService
                 case 'CacatProduk':
                     $modelDesc = 'kerusakan produk';
                     break;
+                case 'Pesan Terkirim':
+                    $modelDesc = 'pesan terkirim';
+                    break;
                 case 'Informasi':
                     $modelDesc = 'informasi';
+                case 'Peran':
+                    $modelDesc = 'peran';
                     break;
             }
 
             // Ambil data pengguna yang sedang melakukan aksi
             $id = $decoded->id;
-            $user = User::find($id);
+            $user = User::with('peran')->find($id);
             if (!$user) {
                 throw new \Exception('Unauthorized');
             }
@@ -87,7 +92,7 @@ class LogService
             $description = sprintf(
                 '%s (%s) %s %s dengan id %s',
                 $user->nama,
-                $user->peran,
+                $user->peran->nama,
                 $model === 'Informasi' ? 'mengedit' : $actionDesc,
                 $modelDesc,
                 $detail['id']

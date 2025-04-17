@@ -27,7 +27,6 @@ class User extends Authenticatable
         'password',
         'peran_id',
         'is_deleted',
-        'is_confirmed',
     ];
 
     protected $hidden = [

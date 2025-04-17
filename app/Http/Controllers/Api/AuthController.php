@@ -38,12 +38,6 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if (!$user->is_confirmed) {
-            return response()->json([
-                'message' => 'Email belum diverifikasi'
-            ], 400);
-        }
-
         // Cek password
         if (!Hash::check($request->password, $user->password)) {
             return response()->json([
@@ -116,12 +110,6 @@ class AuthController extends Controller
         if (!$user || $user->is_deleted) {
             return response()->json([
                 'message' => 'Email tidak ditemukan'
-            ], 400);
-        }
-
-        if (!$user->is_confirmed) {
-            return response()->json([
-                'message' => 'Email belum diverifikasi'
             ], 400);
         }
 

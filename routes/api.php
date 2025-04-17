@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PelangganController;
 use App\Http\Controllers\Api\PemasokController;
 use App\Http\Controllers\Api\PembelianProdukController;
 use App\Http\Controllers\Api\PenggunaController;
+use App\Http\Controllers\Api\PeranController;
 use App\Http\Controllers\Api\PesananController;
 use App\Http\Controllers\Api\PesanController;
 use App\Http\Controllers\Api\ProdukController;
@@ -33,6 +34,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('pengguna', PenggunaController::class);
     Route::apiResource('pesan', PesanController::class);
     Route::apiResource('log-aksi', LogAksiController::class);
+    Route::apiResource('peran', PeranController::class);
     Route::group(['prefix' => 'pesanan'], function () {
         Route::get('/', [PesananController::class, 'index']);
         Route::post('/', [PesananController::class, 'store']);

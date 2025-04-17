@@ -80,7 +80,6 @@ class PenggunaController extends Controller
             'email' => $validated['email'],
             'peran' => $validated['peran'],
             'password' => $hashedPassword,
-            'is_confirmed' => true,
             'is_deleted' => false,
         ]);
 

@@ -32,12 +32,11 @@ class LogAksiController extends Controller
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
-            $logAksi = LogAksi::withCount([])
-                ->where('is_deleted', false)
+            $logAksi = LogAksi::where('is_deleted', false)
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            $user = User::get();
+            $user = User::with('peran')->get();
 
             foreach ($logAksi as $log) {
                 $log->user = $user->where('id', $log->user_id)->first();
@@ -51,7 +50,7 @@ class LogAksiController extends Controller
             // Log::info('Log Aksi', ['querySemua' => $request->query('semua')]);
             // Log::info('Log Aksi', ['decoded role' => $decoded->peran]);
 
-            if ($decoded->peran === 'ManagerOperational' || $decoded->peran === 'Cashier') {
+            if (!$decoded->peran->semua_log_aktivitas) {
                 $logAksi = $logAksi->where('user_id', $decoded->id);
             }
 

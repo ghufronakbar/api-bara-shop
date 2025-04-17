@@ -38,6 +38,19 @@ class AkunController extends Controller
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
+            $payload = [
+                'id' => $user->id,
+                'nama' => $user->nama,
+                'email' => $user->email,
+                'gambar' => $user->gambar,
+                'peran' => $user->peran,
+                'exp' => now()->addDays(1)->timestamp,
+            ];
+
+            $token = JWT::encode($payload, env('JWT_SECRET'), 'HS256');
+
+            $user->token = $token;
+
             return response()->json([
                 'message' => 'OK',
                 'data' => $user,

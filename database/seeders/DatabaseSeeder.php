@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             PemasokSeeder::class,
             ProdukSeeder::class,
             PelangganSeeder::class,
+            PeranSeeder::class
         ]);
     }
 }

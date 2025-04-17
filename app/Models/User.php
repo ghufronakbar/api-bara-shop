@@ -25,7 +25,7 @@ class User extends Authenticatable
         'nama',
         'email',
         'password',
-        'peran',
+        'peran_id',
         'is_deleted',
         'is_confirmed',
     ];
@@ -47,4 +47,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(LogAksi::class);
     }
+
+    public function peran()
+{
+    return $this->belongsTo(Peran::class);
+}
+
 }

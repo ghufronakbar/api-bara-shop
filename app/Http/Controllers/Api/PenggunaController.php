@@ -159,10 +159,10 @@ class PenggunaController extends Controller
         $validated = $validator->validated();
 
         $user->update([
-            'peran' => $validated['peran'],
+            'peran_id' => $validated['peran_id'],
         ]);
 
-        Mail::to($user->email)->send(new EmailPeranBaru($user->nama, $validated['peran']));
+        Mail::to($user->email)->send(new EmailPeranBaru($user->nama, $checkPeran->peran));
 
         $this->logService->saveToLog($request, 'User', $user->toArray());
 

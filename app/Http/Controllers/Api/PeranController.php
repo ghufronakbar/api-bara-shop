@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Peran;
+use App\Models\User;
 use App\Services\LogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -24,7 +25,9 @@ class PeranController extends Controller
      */
     public function index()
     {
-        $perans = Peran::where('is_deleted', false)
+        $perans = Peran::whereHas('users', function ($query) {
+            $query->where('is_deleted', false);
+        })
             ->orderBy('nama', 'asc')
             ->get();
 
@@ -225,6 +228,14 @@ class PeranController extends Controller
             return response()->json([
                 'message' => 'Data tidak ditemukan'
             ], 404);
+        }
+
+        $users = User::where('peran_id', $id)->where('is_deleted', false)->get();
+
+        if ($users->count() > 0) {
+            return response()->json([
+                'message' => 'Tidak dapat menghapus peran yang memiliki pengguna'
+            ], 400);
         }
 
         $peran->update(['is_deleted' => true]);

@@ -55,9 +55,7 @@ return new class extends Migration
             // Menghapus kolom baru yang telah ditambahkan
             $table->dropColumn([
                 'ringkasan',
-                'laporan',
                 'informasi',
-                'kirim_pesan',
                 'pengguna',
                 'peran',
                 'pelanggan',

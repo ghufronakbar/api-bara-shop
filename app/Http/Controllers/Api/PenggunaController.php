@@ -161,7 +161,7 @@ class PenggunaController extends Controller
             'peran_id' => $validated['peran_id'],
         ]);
 
-        Mail::to($user->email)->send(new EmailPeranBaru($user->nama, $checkPeran->peran->nama));
+        Mail::to($user->email)->send(new EmailPeranBaru($user->nama, $checkPeran->nama));
 
         $this->logService->saveToLog($request, 'User', $user->toArray());
 

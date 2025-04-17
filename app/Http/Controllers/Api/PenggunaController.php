@@ -26,7 +26,7 @@ class PenggunaController extends Controller
 
     public function index()
     {
-        $user = User::withCount([])
+        $user = User::with(["peran"])
             ->where('is_deleted', false)
             ->orderBy('nama', 'asc')
             ->get();

@@ -44,15 +44,19 @@ class PeranController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string',
-            'kelola_informasi' => 'required|boolean',
-            'kelola_produk' => 'required|boolean',
-            'kelola_pembelian_produk' => 'required|boolean',
-            'kelola_cacat_produk' => 'required|boolean',
-            'kelola_pelanggan' => 'required|boolean',
-            'kelola_supplier' => 'required|boolean',
-            'semua_log_aktivitas' => 'required|boolean',
-            'kirim_pesan' => 'required|boolean',
+            'ringkasan' => 'required|boolean',
             'laporan' => 'required|boolean',
+            'informasi' => 'required|boolean',
+            'kirim_pesan' => 'required|boolean',
+            'pengguna' => 'required|boolean',
+            'peran' => 'required|boolean',
+            'pelanggan' => 'required|boolean',
+            'produk' => 'required|boolean',
+            'pemasok' => 'required|boolean',
+            'riwayat_pesanan' => 'required|boolean',
+            'pembelian' => 'required|boolean',
+            'cacat_produk' => 'required|boolean',
+            'kasir' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -67,15 +71,19 @@ class PeranController extends Controller
         // Membuat peran baru
         $peran = Peran::create([
             'nama' => $validated['nama'],
-            'kelola_informasi' => $validated['kelola_informasi'],
-            'kelola_produk' => $validated['kelola_produk'],
-            'kelola_pembelian_produk' => $validated['kelola_pembelian_produk'],
-            'kelola_cacat_produk' => $validated['kelola_cacat_produk'],
-            'kelola_pelanggan' => $validated['kelola_pelanggan'],
-            'kelola_supplier' => $validated['kelola_supplier'],
-            'semua_log_aktivitas' => $validated['semua_log_aktivitas'],
-            'kirim_pesan' => $validated['kirim_pesan'],
+            'ringkasan' => $validated['ringkasan'],
             'laporan' => $validated['laporan'],
+            'informasi' => $validated['informasi'],
+            'kirim_pesan' => $validated['kirim_pesan'],
+            'pengguna' => $validated['pengguna'],
+            'peran' => $validated['peran'],
+            'pelanggan' => $validated['pelanggan'],
+            'produk' => $validated['produk'],
+            'pemasok' => $validated['pemasok'],
+            'riwayat_pesanan' => $validated['riwayat_pesanan'],
+            'pembelian' => $validated['pembelian'],
+            'cacat_produk' => $validated['cacat_produk'],
+            'kasir' => $validated['kasir'],
             'is_deleted' => false,
         ]);
 
@@ -134,15 +142,19 @@ class PeranController extends Controller
         $validator = Validator::make(['id' => $id] + $request->all(), [
             'id' => 'required|uuid',
             'nama' => 'required|string',
-            'kelola_informasi' => 'required|boolean',
-            'kelola_produk' => 'required|boolean',
-            'kelola_pembelian_produk' => 'required|boolean',
-            'kelola_cacat_produk' => 'required|boolean',
-            'kelola_pelanggan' => 'required|boolean',
-            'kelola_supplier' => 'required|boolean',
-            'semua_log_aktivitas' => 'required|boolean',
-            'kirim_pesan' => 'required|boolean',
+            'ringkasan' => 'required|boolean',
             'laporan' => 'required|boolean',
+            'informasi' => 'required|boolean',
+            'kirim_pesan' => 'required|boolean',
+            'pengguna' => 'required|boolean',
+            'peran' => 'required|boolean',
+            'pelanggan' => 'required|boolean',
+            'produk' => 'required|boolean',
+            'pemasok' => 'required|boolean',
+            'riwayat_pesanan' => 'required|boolean',
+            'pembelian' => 'required|boolean',
+            'cacat_produk' => 'required|boolean',
+            'kasir' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -164,15 +176,19 @@ class PeranController extends Controller
 
         $peran->update([
             'nama' => $validated['nama'],
-            'kelola_informasi' => $validated['kelola_informasi'],
-            'kelola_produk' => $validated['kelola_produk'],
-            'kelola_pembelian_produk' => $validated['kelola_pembelian_produk'],
-            'kelola_cacat_produk' => $validated['kelola_cacat_produk'],
-            'kelola_pelanggan' => $validated['kelola_pelanggan'],
-            'kelola_supplier' => $validated['kelola_supplier'],
-            'semua_log_aktivitas' => $validated['semua_log_aktivitas'],
-            'kirim_pesan' => $validated['kirim_pesan'],
+            'ringkasan' => $validated['ringkasan'],
             'laporan' => $validated['laporan'],
+            'informasi' => $validated['informasi'],
+            'kirim_pesan' => $validated['kirim_pesan'],
+            'pengguna' => $validated['pengguna'],
+            'peran' => $validated['peran'],
+            'pelanggan' => $validated['pelanggan'],
+            'produk' => $validated['produk'],
+            'pemasok' => $validated['pemasok'],
+            'riwayat_pesanan' => $validated['riwayat_pesanan'],
+            'pembelian' => $validated['pembelian'],
+            'cacat_produk' => $validated['cacat_produk'],
+            'kasir' => $validated['kasir'],
         ]);
 
         $this->logService->saveToLog($request, 'Peran', $peran->toArray());

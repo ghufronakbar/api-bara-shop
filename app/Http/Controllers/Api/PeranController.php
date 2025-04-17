@@ -29,16 +29,15 @@ class PeranController extends Controller
             ->orderBy('nama', 'asc')
             ->get();
 
-        $users = User::where('is_deleted', false)->get();
+        $users = User::where('is_deleted', false)
+            ->orderBy('nama', 'asc')
+            ->get()
+            ->keyBy('id');
 
         foreach ($perans as $peran) {
-            $peran->count_users = $users->where('peran_id', $peran->id)->count();
-            $peran->users = [];
-            foreach ($users as $user) {
-                if ($user->peran_id === $peran->id) {
-                    $peran->users[] = $user;
-                }
-            }
+            $peran->users = $users->where('peran_id', $peran->id)
+                ->values()
+                ->toArray();
         }
 
         return response()->json([
@@ -137,16 +136,12 @@ class PeranController extends Controller
             ], 404);
         }
 
-        $users = User::where('is_deleted', false)->get();
+        $users = User::where('is_deleted', false)
+            ->where('peran_id', $peran->id)
+            ->orderBy('nama', 'asc')
+            ->get();
 
-        $peran->count_users = $users->where('peran_id', $peran->id)->count();
-        $peran->users = [];
-        foreach ($users as $user) {
-            if ($user->peran_id === $peran->id) {
-                $peran->users[] = $user;
-            }
-        }
-
+        $peran->users = $users;
 
         return response()->json([
             'message' => 'OK',

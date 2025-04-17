@@ -80,7 +80,6 @@ class PenggunaController extends Controller
         $user = User::create([
             'nama' => $validated['nama'],
             'email' => $validated['email'],
-            'peran' => $validated['peran'],
             'peran_id' => $validated['peran_id'],
             'password' => $hashedPassword,
             'is_deleted' => false,
@@ -162,7 +161,7 @@ class PenggunaController extends Controller
             'peran_id' => $validated['peran_id'],
         ]);
 
-        Mail::to($user->email)->send(new EmailPeranBaru($user->nama, $checkPeran->peran));
+        Mail::to($user->email)->send(new EmailPeranBaru($user->nama, $checkPeran->peran->nama));
 
         $this->logService->saveToLog($request, 'User', $user->toArray());
 

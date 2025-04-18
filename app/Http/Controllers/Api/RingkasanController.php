@@ -59,7 +59,7 @@ class RingkasanController extends Controller
         foreach ($omzetData as $omzet) {
             $date = $omzet->date;
             $chartData[$date] = [
-                'omzet' => $omzet->omzet,
+                'omzet' => (int) $omzet->omzet,
                 'pengeluaran' => 0,  // Default 0
                 'total_terjual' => 0, // Default 0
                 'total_pembelian' => 0, // Default 0
@@ -77,7 +77,7 @@ class RingkasanController extends Controller
                     'total_pembelian' => 0,
                 ];
             }
-            $chartData[$date]['pengeluaran'] = $pengeluaran->pengeluaran;
+            $chartData[$date]['pengeluaran'] = (int) $pengeluaran->pengeluaran;
         }
 
         // Gabungkan data produk terjual ke dalam chartData
@@ -91,7 +91,7 @@ class RingkasanController extends Controller
                     'total_pembelian' => 0,
                 ];
             }
-            $chartData[$date]['total_terjual'] = $produkTerjual->total_terjual;
+            $chartData[$date]['total_terjual'] = (int) $produkTerjual->total_terjual;
         }
 
         // Gabungkan data pembelian produk ke dalam chartData
@@ -105,12 +105,12 @@ class RingkasanController extends Controller
                     'total_pembelian' => 0,
                 ];
             }
-            $chartData[$date]['total_pembelian'] = $pembelian->total_pembelian;
+            $chartData[$date]['total_pembelian'] = (int) $pembelian->total_pembelian;
         }
 
         // Hitung profit (omzet - pengeluaran)
         foreach ($chartData as $date => $data) {
-            $chartData[$date]['profit'] = $data['omzet'] - $data['pengeluaran'];
+            $chartData[$date]['profit'] = (int) $data['omzet'] - $data['pengeluaran'];
         }
 
         return $chartData;
@@ -134,11 +134,11 @@ class RingkasanController extends Controller
         }
 
         return [
-            'omzet' => number_format($omzet, 2, ',', '.'),
-            'pengeluaran' => number_format($pengeluaran, 2, ',', '.'),
-            'profit' => number_format($profit, 2, ',', '.'),
-            'total_produk_terjual' => number_format($totalProdukTerjual, 0, ',', '.'),
-            'total_pembelian_produk' => number_format($totalPembelianProduk, 0, ',', '.')
+            'omzet' => (int) $omzet,
+            'pengeluaran' => (int) $pengeluaran,
+            'profit' => (int) $profit,
+            'total_produk_terjual' => (int) $totalProdukTerjual,
+            'total_pembelian_produk' => (int) $totalPembelianProduk
         ];
     }
 
@@ -157,6 +157,10 @@ class RingkasanController extends Controller
             ->orderByDesc(DB::raw('SUM(item_pesanan.jumlah)'))
             ->get();
 
+        foreach ($soldProducts as $product) {
+            $product->total_terjual = (int) $product->total_terjual;
+        }
+
         return $soldProducts->toArray();
     }
 
@@ -173,8 +177,8 @@ class RingkasanController extends Controller
         foreach ($soldProducts as $product) {
             $ratioData[] = [
                 'produk_id' => $product['produk_id'],
-                'total_terjual' => $product['total_terjual'],
-                'rasio' => number_format(($product['total_terjual'] / $totalSold) * 100, 2, ',', '.')
+                'total_terjual' => (int) $product['total_terjual'],
+                'rasio' => (float) ((float)$product['total_terjual'] / (float) $totalSold) * 100
             ];
         }
 
@@ -190,7 +194,7 @@ class RingkasanController extends Controller
         $ratio = $this->getRatioSoldProduct($sold);
 
         $data = [
-            'chart' => $chart,
+            'chart' =>  $chart,
             'master' => $master,
             'sold' => $sold,
             'ratio' => $ratio

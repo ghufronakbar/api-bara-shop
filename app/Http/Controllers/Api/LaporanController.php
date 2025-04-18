@@ -59,7 +59,7 @@ class LaporanController extends Controller
         }
 
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPenjualanExport($pesanans), 'Laporan Penjualan ' . env('APP_NAME') . '.xlsx');
+        return Excel::download(new LaporanPenjualanExport($pesanans), 'Laporan Penjualan ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
 
@@ -99,7 +99,7 @@ class LaporanController extends Controller
         }
 
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPembelianExport($pembelianProduks), 'Laporan Pembelian ' . env('APP_NAME') . '.xlsx');
+        return Excel::download(new LaporanPembelianExport($pembelianProduks), 'Laporan Pembelian ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
     /**
@@ -138,7 +138,7 @@ class LaporanController extends Controller
         }
 
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanKerusakanExport($cacatProduks), 'Laporan Kerusakan ' . env('APP_NAME') . '.xlsx');
+        return Excel::download(new LaporanKerusakanExport($cacatProduks), 'Laporan Kerusakan ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
 
@@ -167,7 +167,7 @@ class LaporanController extends Controller
         }
 
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanProdukExport($produks), 'Laporan Produk ' . env('APP_NAME') . '.xlsx');
+        return Excel::download(new LaporanProdukExport($produks), 'Laporan Produk ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
 
@@ -191,7 +191,7 @@ class LaporanController extends Controller
         }
 
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPelangganExport($pelanggans), 'Laporan Pelanggan ' . env('APP_NAME') . '.xlsx');
+        return Excel::download(new LaporanPelangganExport($pelanggans), 'Laporan Pelanggan ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
     public function laporanPemasok(Request $request)
@@ -207,7 +207,7 @@ class LaporanController extends Controller
         }
 
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPemasokExport($pemasoks), 'Laporan Pemasok ' . env('APP_NAME') . '.xlsx');
+        return Excel::download(new LaporanPemasokExport($pemasoks), 'Laporan Pemasok ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 
     public function index(Request $request)

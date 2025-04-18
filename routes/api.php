@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CacatProdukController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\InformasiController;
+use App\Http\Controllers\Api\LaporanController;
 use App\Http\Controllers\Api\LogAksiController;
 use App\Http\Controllers\Api\PelangganController;
 use App\Http\Controllers\Api\PemasokController;
@@ -23,6 +24,14 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 Route::post('image', [ImageController::class, 'upload']);
+
+Route::group(['prefix' => 'laporan'], function () {
+    Route::get('/penjualan', [LaporanController::class, 'laporanPenjualan']);
+    Route::get('/pembelian', [LaporanController::class, 'laporanPembelian']);
+    Route::get('/kerusakan', [LaporanController::class, 'laporanKerusakan']);
+    Route::get('/produk', [LaporanController::class, 'laporanProduk']);
+    Route::get('/pelanggan', [LaporanController::class, 'laporanPelanggan']);
+});
 
 Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('produk', ProdukController::class);

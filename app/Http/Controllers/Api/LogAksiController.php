@@ -47,19 +47,12 @@ class LogAksiController extends Controller
                 }
             };
 
-            // Log::info('Log Aksi', ['querySemua' => $request->query('semua')]);
-            // Log::info('Log Aksi', ['decoded role' => $decoded->peran]);
-
-            if (!$decoded->peran->semua_log_aktivitas) {
-                $logAksi = $logAksi->where('user_id', $decoded->id);
-            }
-
             return response()->json([
                 'message' => 'OK',
                 'data' => $logAksi,
             ]);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Unauthorized', 'error' => $e], 401);
+            return response()->json(['message' => 'Unauthorized', 'error' => $e->getMessage()], 401);
         }
     }
 

@@ -433,12 +433,11 @@ class LaporanController extends Controller
 
         // Loop through the data and populate the sheet
         foreach ($pelanggans as $item) {
-            $kontak = $item->jenis_kode == 'Email' ? $item->kode : '+' . $item->kode;
             $sheet->setCellValue('A' . $row, $item->nomor);
             $sheet->setCellValue('B' . $row, $item->id);
             $sheet->setCellValue('C' . $row, $item->nama);
             $sheet->setCellValue('D' . $row, $item->jenis_kode);
-            $sheet->setCellValue('E' . $row, $kontak);
+            $sheet->setCellValue('E' . $row, $item->kode);
             $sheet->setCellValue('F' . $row, $item->pesanan_count);
             $sheet->setCellValue('G' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
 

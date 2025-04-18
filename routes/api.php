@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\PeranController;
 use App\Http\Controllers\Api\PesananController;
 use App\Http\Controllers\Api\PesanController;
 use App\Http\Controllers\Api\ProdukController;
+use App\Http\Controllers\Api\RingkasanController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'auth'], function () {
@@ -31,6 +32,10 @@ Route::group(['prefix' => 'laporan'], function () {
     Route::get('/kerusakan', [LaporanController::class, 'laporanKerusakan']);
     Route::get('/produk', [LaporanController::class, 'laporanProduk']);
     Route::get('/pelanggan', [LaporanController::class, 'laporanPelanggan']);
+});
+
+Route::group(['prefix' => 'ringkasan'], function () {
+    Route::get('/', [RingkasanController::class, 'index']);
 });
 
 Route::group(['middleware' => ['jwt.auth']], function () {

@@ -177,6 +177,7 @@ class RingkasanController extends Controller
         foreach ($soldProducts as $product) {
             $ratioData[] = [
                 'produk_id' => $product['produk_id'],
+                'nama' => $product['nama'],
                 'total_terjual' => (int) $product['total_terjual'],
                 'rasio' => (float) ((float)$product['total_terjual'] / (float) $totalSold) * 100
             ];

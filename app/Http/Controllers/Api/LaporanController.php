@@ -2,24 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Exports\LaporanKerusakanExport;
-use App\Exports\LaporanPelangganExport;
-use App\Exports\LaporanPemasokExport;
-use App\Exports\LaporanPembelianExport;
 use App\Models\Pesanan;
 use App\Models\ItemPesanan;
-use App\Models\Transaksi;
 use App\Models\Pelanggan;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\LaporanPenjualanExport;
-use App\Exports\LaporanProdukExport;
 use App\Http\Controllers\Controller;
 use App\Models\CacatProduk;
 use App\Models\Pemasok;
 use App\Models\PembelianProduk;
 use App\Models\Produk;
-use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -44,7 +35,6 @@ class LaporanController extends Controller
             ->with(['transaksi', 'item_pesanan.produk', 'pelanggan'])
             ->select('pesanan.*');
 
-
         if ($start) {
             $pesananQuery->whereDate('created_at', '>=', $start);
         }
@@ -61,8 +51,72 @@ class LaporanController extends Controller
             $nomor++;
         }
 
-        // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPenjualanExport($pesanans), 'Laporan Penjualan ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        // Initialize Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        // Set headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'ID Pesanan');
+        $sheet->setCellValue('C1', 'Pelanggan');
+        $sheet->setCellValue('D1', 'Metode Pembayaran');
+        $sheet->setCellValue('E1', 'Produk');
+        $sheet->setCellValue('F1', 'Subtotal');
+        $sheet->setCellValue('G1', 'Diskon');
+        $sheet->setCellValue('H1', 'Pajak');
+        $sheet->setCellValue('I1', 'Total');
+        $sheet->setCellValue('J1', 'Tanggal');
+
+        $row = 2; // Start from second row
+
+        // Loop through the data and populate the sheet
+        foreach ($pesanans as $pesanan) {
+            $sheet->setCellValue('A' . $row, $pesanan->nomor);
+            $sheet->setCellValue('B' . $row, $pesanan->id);
+            $sheet->setCellValue('C' . $row, $pesanan->pelanggan ? $pesanan->pelanggan->nama . ' (' . $pesanan->pelanggan->kode . ')' : '-');
+            $sheet->setCellValue('D' . $row, $pesanan->transaksi ? $pesanan->transaksi->metode : '-');
+
+            // Format the product data (mapping ItemPesanan)
+            $produkData = $pesanan->item_pesanan->map(function ($item) {
+                return $item->produk->nama . ' x ' . $item->jumlah . ' (@' . number_format($item->harga, 0, ',', '.') . ')';
+            })->join(', ');
+            $sheet->setCellValue('E' . $row, $produkData);
+
+            $sheet->setCellValue('F' . $row, $pesanan->total_sementara);
+            $sheet->setCellValue('G' . $row, $pesanan->diskon . ' (' . $pesanan->persentase_diskon . '%)');
+            $sheet->setCellValue('H' . $row, $pesanan->pajak . ' (' . $pesanan->persentase_pajak . '%)');
+            $sheet->setCellValue('I' . $row, $pesanan->total_akhir);
+            $sheet->setCellValue('J' . $row, date('d-m-Y H:i:s', strtotime($pesanan->created_at)));
+
+            $row++;
+        }
+
+        $styleArrayFirstRow = [
+            'font' => [
+                'bold' => true,
+            ]
+        ];
+
+        $highestColumn = $sheet->getHighestColumn();
+
+        //set first row bold
+        foreach (range('A', $highestColumn) as $column) {
+            $sheet->getStyle($column . '1')->applyFromArray($styleArrayFirstRow);
+        }
+
+        // Create the response and stream the file directly
+        $writer = new Xlsx($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output'); // Stream directly to the browser
+        });
+
+        // Set the headers for the response to indicate it's an Excel file
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Penjualan ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Cache-Control', 'no-cache');
+
+        return $response;
     }
 
 
@@ -101,8 +155,64 @@ class LaporanController extends Controller
             $nomor++;
         }
 
-        // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPembelianExport($pembelianProduks), 'Laporan Pembelian ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        // Initialize Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        // Set headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'ID Pembelian');
+        $sheet->setCellValue('C1', 'Produk');
+        $sheet->setCellValue('D1', 'Pemasok');
+        $sheet->setCellValue('E1', 'Jumlah');
+        $sheet->setCellValue('F1', 'Harga');
+        $sheet->setCellValue('G1', 'Total');
+        $sheet->setCellValue('H1', 'Deskripsi');
+        $sheet->setCellValue('I1', 'Tanggal');
+
+        $row = 2; // Start from second row
+
+        // Loop through the data and populate the sheet
+        foreach ($pembelianProduks as $item) {
+            $sheet->setCellValue('A' . $row, $item->nomor);
+            $sheet->setCellValue('B' . $row, $item->id);
+            $sheet->setCellValue('C' . $row, $item->produk->nama);
+            $sheet->setCellValue('D' . $row, $item->pemasok->nama);
+            $sheet->setCellValue('E' . $row, $item->jumlah);
+            $sheet->setCellValue('F' . $row, $item->harga);
+            $sheet->setCellValue('G' . $row, $item->total);
+            $sheet->setCellValue('H' . $row, $item->deskripsi);
+            $sheet->setCellValue('I' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
+
+            $row++;
+        }
+
+        $styleArrayFirstRow = [
+            'font' => [
+                'bold' => true,
+            ]
+        ];
+
+        $highestColumn = $sheet->getHighestColumn();
+
+        //set first row bold
+        foreach (range('A', $highestColumn) as $column) {
+            $sheet->getStyle($column . '1')->applyFromArray($styleArrayFirstRow);
+        }
+
+        // Create the response and stream the file directly
+        $writer = new Xlsx($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output'); // Stream directly to the browser
+        });
+
+        // Set the headers for the response to indicate it's an Excel file
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Pembelian ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Cache-Control', 'no-cache');
+
+        return $response;
     }
 
     /**
@@ -140,8 +250,58 @@ class LaporanController extends Controller
             $nomor++;
         }
 
-        // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanKerusakanExport($cacatProduks), 'Laporan Kerusakan ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        // Initialize Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        // Set headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'ID Kerusakan');
+        $sheet->setCellValue('C1', 'Produk');
+        $sheet->setCellValue('D1', 'Jumlah');
+        $sheet->setCellValue('E1', 'Alasan');
+        $sheet->setCellValue('F1', 'Tanggal');
+
+        $row = 2; // Start from second row
+
+        // Loop through the data and populate the sheet
+        foreach ($cacatProduks as $item) {
+            $sheet->setCellValue('A' . $row, $item->nomor);
+            $sheet->setCellValue('B' . $row, $item->id);
+            $sheet->setCellValue('C' . $row, $item->produk->nama);
+            $sheet->setCellValue('D' . $row, $item->jumlah);
+            $sheet->setCellValue('E' . $row, $item->alasan);
+            $sheet->setCellValue('F' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
+
+            $row++;
+        }
+
+        $styleArrayFirstRow = [
+            'font' => [
+                'bold' => true,
+            ]
+        ];
+
+        $highestColumn = $sheet->getHighestColumn();
+
+        //set first row bold
+        foreach (range('A', $highestColumn) as $column) {
+            $sheet->getStyle($column . '1')->applyFromArray($styleArrayFirstRow);
+        }
+
+        // Create the response and stream the file directly
+        $writer = new Xlsx($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output'); // Stream directly to the browser
+        });
+
+        // Set the headers for the response to indicate it's an Excel file
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Pembelian ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Cache-Control', 'no-cache');
+
+        return $response;
     }
 
 
@@ -169,17 +329,67 @@ class LaporanController extends Controller
             $nomor++;
         }
 
-         // Create the Excel file as a stream (without writing to disk)
-         $excelStream = Excel::blob(new LaporanProdukExport($produks), \Maatwebsite\Excel\Excel::XLSX);
+        // Initialize Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
-         // Return the file as a streamed response to the browser without saving it to a temporary file
-         $response = new StreamedResponse(function () use ($excelStream) {
-             echo $excelStream;
-         });
 
-           // Set the response headers for file download
+        // Set headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'ID Produk');
+        $sheet->setCellValue('C1', 'Nama');
+        $sheet->setCellValue('D1', 'Kategori');
+        $sheet->setCellValue('E1', 'Harga');
+        $sheet->setCellValue('F1', 'Harga Rata-Rata Pembelian');
+        $sheet->setCellValue('G1', 'Stok');
+        $sheet->setCellValue('H1', 'Terjual');
+        $sheet->setCellValue('I1', 'Pembelian');
+        $sheet->setCellValue('J1', 'Kerusakan');
+        $sheet->setCellValue('K1', 'Deskripsi');
+        $sheet->setCellValue('L1', 'Terdaftar Pada');
+
+        $row = 2; // Start from second row
+
+        // Loop through the data and populate the sheet
+        foreach ($produks as $item) {
+            $sheet->setCellValue('A' . $row, $item->nomor);
+            $sheet->setCellValue('B' . $row, $item->id);
+            $sheet->setCellValue('C' . $row, $item->nama);
+            $sheet->setCellValue('D' . $row, $item->kategori);
+            $sheet->setCellValue('E' . $row, $item->harga);
+            $sheet->setCellValue('F' . $row, $item->hpp);
+            $sheet->setCellValue('G' . $row, $item->jumlah);
+            $sheet->setCellValue('H' . $row, $item->total_terjual);
+            $sheet->setCellValue('I' . $row, $item->total_pembelian);
+            $sheet->setCellValue('J' . $row, $item->total_cacat);
+            $sheet->setCellValue('K' . $row, $item->deskripsi ?: '-');
+            $sheet->setCellValue('L' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
+
+            $row++;
+        }
+
+        $styleArrayFirstRow = [
+            'font' => [
+                'bold' => true,
+            ]
+        ];
+
+        $highestColumn = $sheet->getHighestColumn();
+
+        //set first row bold
+        foreach (range('A', $highestColumn) as $column) {
+            $sheet->getStyle($column . '1')->applyFromArray($styleArrayFirstRow);
+        }
+
+        // Create the response and stream the file directly
+        $writer = new Xlsx($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output'); // Stream directly to the browser
+        });
+
+        // Set the headers for the response to indicate it's an Excel file
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Penjualan ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Produk ' . env('APP_NAME') . '.xlsx"');
         $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
@@ -205,8 +415,61 @@ class LaporanController extends Controller
             $nomor++;
         }
 
-        // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPelangganExport($pelanggans), 'Laporan Pelanggan ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        // Initialize Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        // Set headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'ID Pelanggan');
+        $sheet->setCellValue('C1', 'Nama');
+        $sheet->setCellValue('D1', 'Tipe');
+        $sheet->setCellValue('E1', 'Kontak');
+        $sheet->setCellValue('F1', 'Total Pesanan');
+        $sheet->setCellValue('G1', 'Terdaftar Pada');
+
+        $row = 2; // Start from second row
+
+        // Loop through the data and populate the sheet
+        foreach ($pelanggans as $item) {
+            $kontak = $item->jenis_kode == 'Email' ? $item->kode : '+' . $item->kode;
+            $sheet->setCellValue('A' . $row, $item->nomor);
+            $sheet->setCellValue('B' . $row, $item->id);
+            $sheet->setCellValue('C' . $row, $item->nama);
+            $sheet->setCellValue('D' . $row, $item->jenis_kode);
+            $sheet->setCellValue('E' . $row, $kontak);
+            $sheet->setCellValue('F' . $row, $item->pesanan_count);
+            $sheet->setCellValue('G' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
+
+            $row++;
+        }
+
+        $styleArrayFirstRow = [
+            'font' => [
+                'bold' => true,
+            ]
+        ];
+
+        $highestColumn = $sheet->getHighestColumn();
+
+        //set first row bold
+        foreach (range('A', $highestColumn) as $column) {
+            $sheet->getStyle($column . '1')->applyFromArray($styleArrayFirstRow);
+        }
+
+        // Create the response and stream the file directly
+        $writer = new Xlsx($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output'); // Stream directly to the browser
+        });
+
+        // Set the headers for the response to indicate it's an Excel file
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Pelanggan ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Cache-Control', 'no-cache');
+
+        return $response;
     }
 
     public function laporanPemasok(Request $request)
@@ -218,11 +481,62 @@ class LaporanController extends Controller
         // Menambahkan nomor urut
         $nomor = 1;
         foreach ($pemasoks as $pemasok) {
+            $pemasok->nomor = $nomor;
             $nomor++;
         }
 
-        // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanPemasokExport($pemasoks), 'Laporan Pemasok ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        // Initialize Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        // Set headers
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'ID Pemasok');
+        $sheet->setCellValue('C1', 'Nama');
+        $sheet->setCellValue('D1', 'Kontak');
+        $sheet->setCellValue('E1', 'Total Pesanan');
+        $sheet->setCellValue('F1', 'Terdaftar Pada');
+
+        $row = 2; // Start from second row
+
+        // Loop through the data and populate the sheet
+        foreach ($pemasoks as $item) {
+            $sheet->setCellValue('A' . $row, $item->nomor);
+            $sheet->setCellValue('B' . $row, $item->id);
+            $sheet->setCellValue('C' . $row, $item->nama);
+            $sheet->setCellValue('D' . $row, $item->telepon);
+            $sheet->setCellValue('E' . $row, $item->pembelian_produk_count);
+            $sheet->setCellValue('F' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
+
+            $row++;
+        }
+
+        $styleArrayFirstRow = [
+            'font' => [
+                'bold' => true,
+            ]
+        ];
+
+        $highestColumn = $sheet->getHighestColumn();
+
+        //set first row bold
+        foreach (range('A', $highestColumn) as $column) {
+            $sheet->getStyle($column . '1')->applyFromArray($styleArrayFirstRow);
+        }
+
+        // Create the response and stream the file directly
+        $writer = new Xlsx($spreadsheet);
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output'); // Stream directly to the browser
+        });
+
+        // Set the headers for the response to indicate it's an Excel file
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Pemasok ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Cache-Control', 'no-cache');
+
+        return $response;
     }
 
     public function index(Request $request)
@@ -273,87 +587,5 @@ class LaporanController extends Controller
             'message' => 'OK',
             'data' => $data
         ]);
-    }
-
-    public function test(Request $request)
-    {
-        // Menangani query params untuk filter berdasarkan 'start' dan 'end'
-        $start = $request->query('start');
-        $end = $request->query('end');
-
-        // Membuat query untuk mengambil data pesanan
-        $pesananQuery = Pesanan::query()
-            ->where('is_deleted', false)
-            ->with(['transaksi', 'item_pesanan.produk', 'pelanggan'])
-            ->select('pesanan.*');
-
-        if ($start) {
-            $pesananQuery->whereDate('created_at', '>=', $start);
-        }
-
-        if ($end) {
-            $pesananQuery->whereDate('created_at', '<=', $end);
-        }
-
-        $pesanans = $pesananQuery->get();
-
-        $nomor = 1;
-        foreach ($pesanans as $pesanan) {
-            $pesanan->nomor = $nomor;
-            $nomor++;
-        }
-
-        // Initialize Spreadsheet
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Set headers
-        $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'ID Pesanan');
-        $sheet->setCellValue('C1', 'Pelanggan');
-        $sheet->setCellValue('D1', 'Metode Pembayaran');
-        $sheet->setCellValue('E1', 'Produk');
-        $sheet->setCellValue('F1', 'Subtotal');
-        $sheet->setCellValue('G1', 'Diskon');
-        $sheet->setCellValue('H1', 'Pajak');
-        $sheet->setCellValue('I1', 'Total');
-        $sheet->setCellValue('J1', 'Tanggal');
-
-        $row = 2; // Start from second row
-
-        // Loop through the data and populate the sheet
-        foreach ($pesanans as $pesanan) {
-            $sheet->setCellValue('A' . $row, $pesanan->nomor);
-            $sheet->setCellValue('B' . $row, $pesanan->id);
-            $sheet->setCellValue('C' . $row, $pesanan->pelanggan ? $pesanan->pelanggan->nama . ' (' . $pesanan->pelanggan->kode . ')' : '-');
-            $sheet->setCellValue('D' . $row, $pesanan->transaksi ? $pesanan->transaksi->metode : '-');
-
-            // Format the product data (mapping ItemPesanan)
-            $produkData = $pesanan->item_pesanan->map(function ($item) {
-                return $item->produk->nama . ' x ' . $item->jumlah . ' (@' . number_format($item->harga, 0, ',', '.') . ')';
-            })->join(', ');
-            $sheet->setCellValue('E' . $row, $produkData);
-
-            $sheet->setCellValue('F' . $row, number_format($pesanan->total_sementara, 0, ',', '.'));
-            $sheet->setCellValue('G' . $row, number_format($pesanan->diskon, 0, ',', '.') . ' (' . $pesanan->persentase_diskon . '%)');
-            $sheet->setCellValue('H' . $row, number_format($pesanan->pajak, 0, ',', '.') . ' (' . $pesanan->persentase_pajak . '%)');
-            $sheet->setCellValue('I' . $row, number_format($pesanan->total_akhir, 0, ',', '.'));
-            $sheet->setCellValue('J' . $row, date('d-m-Y H:i:s', strtotime($pesanan->created_at)));
-
-            $row++;
-        }
-
-        // Create the response and stream the file directly
-        $writer = new Xlsx($spreadsheet);
-        $response = new StreamedResponse(function() use ($writer) {
-            $writer->save('php://output'); // Stream directly to the browser
-        });
-
-        // Set the headers for the response to indicate it's an Excel file
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Penjualan ' . env('APP_NAME') . '.xlsx"');
-        $response->headers->set('Cache-Control', 'no-cache');
-
-        return $response;
     }
 }

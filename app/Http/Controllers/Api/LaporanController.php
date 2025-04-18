@@ -333,6 +333,7 @@ class LaporanController extends Controller
 
     public function laporanPelanggan(Request $request)
     {
+
         $pelanggans = Pelanggan::withCount(["pesanan"])->where('is_deleted', false)->get();
 
         $nomor = 1;
@@ -341,11 +342,9 @@ class LaporanController extends Controller
             $nomor++;
         }
 
-        // Initialize the spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Set column headings
         $sheet->setCellValue('A1', 'No');
         $sheet->setCellValue('B1', 'ID Pelanggan');
         $sheet->setCellValue('C1', 'Nama');
@@ -354,8 +353,8 @@ class LaporanController extends Controller
         $sheet->setCellValue('F1', 'Total Pesanan');
         $sheet->setCellValue('G1', 'Terdaftar Pada');
 
-        // Fill data
         $row = 2;
+
         foreach ($pelanggans as $item) {
             $sheet->setCellValue('A' . $row, $item->nomor);
             $sheet->setCellValue('B' . $row, $item->id);
@@ -368,7 +367,6 @@ class LaporanController extends Controller
             $row++;
         }
 
-        // Apply style to the first row
         $styleArrayFirstRow = [
             'font' => [
                 'bold' => true,
@@ -381,12 +379,9 @@ class LaporanController extends Controller
             $sheet->getStyle($column . '1')->applyFromArray($styleArrayFirstRow);
         }
 
-        // Create the writer and response
         $writer = new Xlsx($spreadsheet);
-
-        // Stream the response without writing to disk
         $response = new StreamedResponse(function () use ($writer) {
-            $writer->save('php://output');  // Send directly to the browser
+            $writer->save('php://output');
         });
 
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

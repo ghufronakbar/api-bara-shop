@@ -20,6 +20,7 @@ use App\Models\Pemasok;
 use App\Models\PembelianProduk;
 use App\Models\Produk;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LaporanController extends Controller
 {
@@ -166,11 +167,26 @@ class LaporanController extends Controller
             $nomor++;
         }
 
+         // Create the Excel file as a stream (without writing to disk)
+         $excelStream = Excel::raw(new LaporanProdukExport($produks), \Maatwebsite\Excel\Excel::XLSX);
+
+         // Return the file as a streamed response to the browser without saving it to a temporary file
+         $response = new StreamedResponse(function () use ($excelStream) {
+             echo $excelStream;
+         });
+
+           // Set the response headers for file download
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Penjualan ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Cache-Control', 'no-cache');
+
+        return $response;
+
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanProdukExport($produks), 'Laporan Produk ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="Laporan Produk ' . env('APP_NAME') . '.xlsx"',
-        ]);
+        // return Excel::download(new LaporanProdukExport($produks), 'Laporan Produk ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX, [
+        //     'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Content-Disposition' => 'attachment; filename="Laporan Produk ' . env('APP_NAME') . '.xlsx"',
+        // ]);
     }
 
 

@@ -167,7 +167,10 @@ class LaporanController extends Controller
         }
 
         // Mengirim data ke export untuk diekspor ke Excel
-        return Excel::download(new LaporanProdukExport($produks), 'Laporan Produk ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        return Excel::download(new LaporanProdukExport($produks), 'Laporan Produk ' . env('APP_NAME') . '.xlsx', \Maatwebsite\Excel\Excel::XLSX, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="Laporan Produk ' . env('APP_NAME') . '.xlsx"',
+        ]);
     }
 
 

@@ -8,15 +8,15 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use App\Models\Pelanggan;
+use App\Models\pemasok;
 
-class LaporanPelangganExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithStyles
+class LaporanPemasokExport implements FromCollection, WithHeadings, WithMapping, WithTitle, WithStyles
 {
-    protected $pelanggans;
+    protected $pemasoks;
 
-    public function __construct($pelanggans)
+    public function __construct($pemasoks)
     {
-        $this->pelanggans = $pelanggans;
+        $this->pemasoks = $pemasoks;
     }
 
     /**
@@ -26,7 +26,7 @@ class LaporanPelangganExport implements FromCollection, WithHeadings, WithMappin
      */
     public function collection()
     {
-        return $this->pelanggans;
+        return $this->pemasoks;
     }
 
     /**
@@ -38,9 +38,8 @@ class LaporanPelangganExport implements FromCollection, WithHeadings, WithMappin
     {
         return [
             'No',
-            'ID Pelanggan',
+            'ID Pemasok',
             'Nama',
-            'Tipe',
             'Kontak',
             'Total Pesanan',
             'Terdaftar Pada'
@@ -55,14 +54,12 @@ class LaporanPelangganExport implements FromCollection, WithHeadings, WithMappin
      */
     public function map($row): array
     {
-        $kontak = $row->jenis_kode == 'Email' ? $row->kode : '+' . $row->kode;
         return [
             $row->nomor, // Incremented nomor
             $row->id,
             $row->nama,
-            $row->jenis_kode,
-            $kontak,
-            $row->pesanan_count,
+            $row->telepon,
+            $row->pembelian_produk_count,
             date('d-m-Y H:i:s', strtotime($row->created_at))
         ];
     }
@@ -74,7 +71,7 @@ class LaporanPelangganExport implements FromCollection, WithHeadings, WithMappin
      */
     public function title(): string
     {
-        return 'Laporan Pelanggan ' . env("APP_NAME");
+        return 'Laporan pemasok ' . env("APP_NAME");
     }
 
     /**
@@ -86,10 +83,10 @@ class LaporanPelangganExport implements FromCollection, WithHeadings, WithMappin
     public function styles(Worksheet $sheet)
     {
         // Apply bold font style to the headings
-        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true);
 
         // Menyesuaikan lebar kolom berdasarkan panjang data
-        foreach (range('A', 'G') as $column) {
+        foreach (range('A', 'F') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 

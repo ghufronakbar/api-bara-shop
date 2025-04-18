@@ -27,16 +27,16 @@ Route::group(['prefix' => 'auth'], function () {
 Route::post('image', [ImageController::class, 'upload']);
 
 Route::group(['prefix' => 'laporan'], function () {
+    Route::get('/', [LaporanController::class, 'index']);
     Route::get('/penjualan', [LaporanController::class, 'laporanPenjualan']);
     Route::get('/pembelian', [LaporanController::class, 'laporanPembelian']);
     Route::get('/kerusakan', [LaporanController::class, 'laporanKerusakan']);
     Route::get('/produk', [LaporanController::class, 'laporanProduk']);
     Route::get('/pelanggan', [LaporanController::class, 'laporanPelanggan']);
+    Route::get('/pemasok', [LaporanController::class, 'laporanPemasok']);
 });
 
-Route::group(['prefix' => 'ringkasan'], function () {
-    Route::get('/', [RingkasanController::class, 'index']);
-});
+Route::get('/ringkasan', [RingkasanController::class, 'index']);
 
 Route::group(['middleware' => ['jwt.auth']], function () {
     Route::apiResource('produk', ProdukController::class);

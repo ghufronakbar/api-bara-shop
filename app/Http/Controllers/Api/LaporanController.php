@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Exports\LaporanKerusakanExport;
 use App\Exports\LaporanPelangganExport;
+use App\Exports\LaporanPemasokExport;
 use App\Exports\LaporanPembelianExport;
 use App\Models\Pesanan;
 use App\Models\ItemPesanan;
@@ -15,6 +16,7 @@ use App\Exports\LaporanPenjualanExport;
 use App\Exports\LaporanProdukExport;
 use App\Http\Controllers\Controller;
 use App\Models\CacatProduk;
+use App\Models\Pemasok;
 use App\Models\PembelianProduk;
 use App\Models\Produk;
 use Illuminate\Support\Facades\DB;
@@ -190,5 +192,71 @@ class LaporanController extends Controller
 
         // Mengirim data ke export untuk diekspor ke Excel
         return Excel::download(new LaporanPelangganExport($pelanggans), 'Laporan Pelanggan ' . env('APP_NAME') . '.xlsx');
+    }
+
+    public function laporanPemasok(Request $request)
+    {
+
+        // Membuat query untuk mengambil data pelanggan
+        $pemasoks = Pemasok::withCount(["pembelian_produk"])->where('is_deleted', false)->get();
+
+        // Menambahkan nomor urut
+        $nomor = 1;
+        foreach ($pemasoks as $pemasok) {
+            $nomor++;
+        }
+
+        // Mengirim data ke export untuk diekspor ke Excel
+        return Excel::download(new LaporanPemasokExport($pemasoks), 'Laporan Pemasok ' . env('APP_NAME') . '.xlsx');
+    }
+
+    public function index(Request $request)
+    {
+        $start = $request->query('start');
+        $end = $request->query('end');
+
+        $penjualanQuery = Pesanan::query()
+            ->where('is_deleted', false);
+
+        $pembelianQuery = PembelianProduk::query()
+            ->where('is_deleted', false);
+
+        $cacatProdukQuery = CacatProduk::query()
+            ->where('is_deleted', false);
+
+        if ($start) {
+            $penjualanQuery->whereDate('created_at', '>=', $start);
+            $pembelianQuery->whereDate('created_at', '>=', $start);
+            $cacatProdukQuery->whereDate('created_at', '>=', $start);
+        }
+
+        if ($end) {
+            $penjualanQuery->whereDate('created_at', '<=', $end);
+            $pembelianQuery->whereDate('created_at', '<=', $end);
+            $cacatProdukQuery->whereDate('created_at', '<=', $end);
+        }
+
+        $penjualan = $penjualanQuery->count();
+        $pembelian = $pembelianQuery->count();
+        $kerusakan = $cacatProdukQuery->count();
+
+        $produk = Produk::where('is_deleted', false)->count();
+        $pemasok = Pemasok::where('is_deleted', false)->count();
+        $pelanggan = Pelanggan::where('is_deleted', false)->count();
+
+
+        $data = [
+            'penjualan' => $penjualan,
+            'pembelian' => $pembelian,
+            'kerusakan' => $kerusakan,
+            'produk' => $produk,
+            'pemasok' => $pemasok,
+            'pelanggan' => $pelanggan
+        ];
+
+        return response()->json([
+            'message' => 'OK',
+            'data' => $data
+        ]);
     }
 }

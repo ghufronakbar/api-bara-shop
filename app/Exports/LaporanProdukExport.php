@@ -105,7 +105,7 @@ class LaporanProdukExport implements FromCollection, WithHeadings, WithMapping, 
         $sheet->getStyle('A1:M1')->getFont()->setBold(true);
 
         // Menyesuaikan lebar kolom berdasarkan panjang data
-        foreach (range('A', 'I') as $column) {
+        foreach (range('A', 'M') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 

@@ -10,16 +10,16 @@ return new class extends Migration
     {
         Schema::create('transaksi', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->float('jumlah');
-            $table->enum('metode', ['Cash', 'VirtualAccountOrBank']);
-            $table->enum('status', ['Pending', 'Success']);
-            $table->json('detail');
+            $table->float('jumlah_pembayaran');
+            $table->enum('metode_pembayaran', ['Cash', 'VirtualAccountOrBank']);
+            $table->enum('status_pembayaran', ['Pending', 'Success']);
+            $table->json('detail_transaksi')->nullable();
 
-            $table->string('snap_token')->nullable();
-            $table->string('url_redirect')->nullable();
+            $table->string('midtrans_snap_token')->nullable();
+            $table->string('midtrans_url_redirect')->nullable();
 
             $table->uuid('pesanan_id')->unique();
-            $table->foreign('pesanan_id')->references('id')->on('pesanan')->onDelete('cascade');
+            $table->foreign('pesanan_id')->references('pesanan_id')->on('pesanan')->onDelete('cascade');
 
             $table->boolean('is_deleted')->default(false);
             $table->timestamps(0);

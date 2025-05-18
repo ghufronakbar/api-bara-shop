@@ -14,17 +14,23 @@ return new class extends Migration
     public function up()
     {
         Schema::create('peran', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('nama');
-            $table->boolean('kelola_informasi')->default(false);
-            $table->boolean('kelola_produk')->default(false);
-            $table->boolean('kelola_pembelian_produk')->default(false);
-            $table->boolean('kelola_cacat_produk')->default(false);
-            $table->boolean('kelola_pelanggan')->default(false);
-            $table->boolean('kelola_supplier')->default(false);
-            $table->boolean('semua_log_aktivitas')->default(false);
-            $table->boolean('kirim_pesan')->default(false);
-            $table->boolean('laporan')->default(false);
+            $table->uuid('peran_id')->primary();
+            $table->string('nama_peran');
+
+            $table->boolean('akses_ringkasan')->default(false);
+            $table->boolean('akses_laporan')->default(false);
+            $table->boolean('akses_informasi')->default(false);
+            $table->boolean('akses_kirim_pesan')->default(false);
+            $table->boolean('akses_pengguna')->default(false);
+            $table->boolean('akses_peran')->default(false);
+            $table->boolean('akses_pelanggan')->default(false);
+            $table->boolean('akses_produk')->default(false);
+            $table->boolean('akses_pemasok')->default(false);
+            $table->boolean('akses_riwayat_pesanan')->default(false);
+            $table->boolean('akses_pembelian')->default(false);
+            $table->boolean('akses_cacat_produk')->default(false);
+            $table->boolean('akses_kasir')->default(false);
+
             $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });

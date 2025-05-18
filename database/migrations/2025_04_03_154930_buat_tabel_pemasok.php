@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pemasok', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('nama');
-            $table->text('alamat');
-            $table->string('telepon');
-            $table->string('gambar')->nullable();
+            $table->uuid('pemasok_id')->primary();
+            $table->string('nama_pemasok');
+            $table->text('alamat_pemasok');
+            $table->string('telepon_pemasok');
+            $table->string('logo_pemasok')->nullable();
 
             $table->boolean('is_deleted')->default(false);
             $table->timestamps(0);

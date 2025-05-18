@@ -9,12 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pesan_terkirim', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('subjek');
-            $table->text('pesan');
+            $table->uuid('pesan_terkirim_id')->primary();
+            $table->string('subjek_pesan');
+            $table->text('isi_pesan');
 
             $table->uuid('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
 
             $table->boolean('is_deleted')->default(false);
             $table->timestamps(0);

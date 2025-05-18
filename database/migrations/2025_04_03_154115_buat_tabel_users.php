@@ -9,15 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('nama');
+            $table->uuid('user_id')->primary();
+            $table->string('nama_pengguna');
             $table->string('email')->unique();
-            $table->string('password')->nullable();
-
-            $table->enum('peran', ['Owner', 'Admin', 'ManagerOperational', 'Cashier']);
+            $table->string('password');
 
             $table->boolean('is_deleted')->default(false);
-            $table->boolean('is_confirmed')->default(false);
 
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();

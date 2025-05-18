@@ -9,17 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('pembelian_produk', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->float('jumlah');
-            $table->float('harga');
-            $table->float('total');
-            $table->text('deskripsi')->nullable();
+            $table->uuid('pembelian_produk_id')->primary();
+            $table->float('jumlah_pembelian');
+            $table->float('harga_per_barang');
+            $table->float('total_harga');
+            $table->text('deskripsi_pembelian')->nullable();
 
             $table->uuid('produk_id');
-            $table->foreign('produk_id')->references('id')->on('produk')->onDelete('cascade');
+            $table->foreign('produk_id')->references('produk_id')->on('produk')->onDelete('cascade');
 
             $table->uuid('pemasok_id');
-            $table->foreign('pemasok_id')->references('id')->on('pemasok')->onDelete('cascade');
+            $table->foreign('pemasok_id')->references('pemasok_id')->on('pemasok')->onDelete('cascade');
 
             $table->boolean('is_deleted')->default(false);
             $table->timestamps(0);

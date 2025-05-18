@@ -15,14 +15,10 @@ return new class extends Migration
     {
         // Mengubah tabel users
         Schema::table('users', function (Blueprint $table) {
-            // Menghapus field peran yang ada
-            $table->dropColumn('peran');
 
-            // Menambahkan field peran_id yang menghubungkan ke tabel peran
-            $table->uuid('peran_id')->nullable()->after('id');
+            $table->uuid('peran_id')->after('user_id');
 
-            // Menambahkan foreign key constraint
-            $table->foreign('peran_id')->references('id')->on('peran')->onDelete('set null');
+            $table->foreign('peran_id')->references('peran_id')->on('peran')->onDelete('cascade');
         });
     }
 
@@ -37,7 +33,6 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['peran_id']);
             $table->dropColumn('peran_id');
-            $table->string('peran')->nullable()->after('id');
         });
     }
 };

@@ -12,14 +12,16 @@ class Pelanggan extends Model
 
     protected $table = 'pelanggan';
 
+    protected $primaryKey = 'pelanggan_id';
+
     protected $casts = [
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'nama',
-        'kode',
+        'pelanggan_id',
+        'nama_pelanggan',
+        'kode_pelanggan',
         'jenis_kode',
         'is_deleted',
     ];
@@ -27,8 +29,8 @@ class Pelanggan extends Model
     protected static function booted()
     {
         static::creating(function ($pelanggan) {
-            if (empty($pelanggan->id)) {
-                $pelanggan->id = (string) Str::uuid();
+            if (empty($pelanggan->pelanggan_id)) {
+                $pelanggan->pelanggan_id = (string) Str::uuid();
             }
         });
     }

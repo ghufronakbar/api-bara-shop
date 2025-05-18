@@ -12,15 +12,17 @@ class CacatProduk extends Model
 
     protected $table = 'cacat_produk';
 
+    protected $primaryKey = 'cacat_produk_id';
+
     protected $casts = [
-        'jumlah' => 'float',
+        'jumlah_produk' => 'float',
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'jumlah',
-        'alasan',
+        'cacat_produk_id',
+        'jumlah_produk',
+        'alasan_kerusakan',
         'produk_id',
         'is_deleted',
     ];
@@ -28,8 +30,8 @@ class CacatProduk extends Model
     protected static function booted()
     {
         static::creating(function ($cacat_produk) {
-            if (empty($cacat_produk->id)) {
-                $cacat_produk->id = (string) Str::uuid();
+            if (empty($cacat_produk->cacat_produk_id)) {
+                $cacat_produk->cacat_produk_id = (string) Str::uuid();
             }
         });
     }

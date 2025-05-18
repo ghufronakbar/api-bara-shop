@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class LogAksi extends Model
 {
@@ -11,21 +12,33 @@ class LogAksi extends Model
 
     protected $table = 'log_aksi';
 
+    protected $primaryKey = 'log_aksi_id';
+
     protected $casts = [
-        'detail' => 'array',
+        'detail_aksi' => 'array',
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'deskripsi',
-        'detail',
+        'log_aksi_id',
+        'deskripsi_aksi',
+        'detail_aksi',
         'referensi_id',
         'model_referensi',
-        'aksi',
+        'jenis_aksi',
         'user_id',
         'is_deleted',
     ];
+
+      protected static function booted()
+    {
+        static::creating(function ($log) {
+            if (empty($log->log_aksi_id)) {
+                $log->log_aksi_id = (string) Str::uuid();
+            }
+        });
+    }
+
 
     public function user()
     {

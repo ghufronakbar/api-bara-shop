@@ -11,31 +11,32 @@ class Produk extends Model
     protected $keyType = 'string';
 
     protected $table = 'produk';
+    protected $primaryKey = 'produk_id';
 
     protected $casts = [
-        'jumlah' => 'float',
-        'harga' => 'float',
+        'jumlah_stok' => 'float',
+        'harga_produk' => 'float',
         'hpp' => 'float',
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'nama',
-        'harga',
-        'jumlah',
+        'produk_id',
+        'nama_produk',
+        'harga_produk',
+        'jumlah_stok',
         'hpp',
-        'kategori',
-        'deskripsi',
-        'gambar',
+        'kategori_produk',
+        'deskripsi_produk',
+        'foto_produk',
         'is_deleted',
     ];
 
     protected static function booted()
     {
         static::creating(function ($produk) {
-            if (empty($produk->id)) {
-                $produk->id = (string) Str::uuid();
+            if (empty($produk->produk_id)) {
+                $produk->produk_id = (string) Str::uuid();
             }
         });
     }

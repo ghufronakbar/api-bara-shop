@@ -12,24 +12,26 @@ class Pemasok extends Model
 
     protected $table = 'pemasok';
 
+    protected $primaryKey = 'pemasok_id';
+
     protected $casts = [
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'nama',
-        'alamat',
-        'telepon',
-        'gambar',
+        'pemasok_id',
+        'nama_pemasok',
+        'alamat_pemasok',
+        'telepon_pemasok',
+        'logo_pemasok',
         'is_deleted',
     ];
 
     protected static function booted()
     {
         static::creating(function ($pemasok) {
-            if (empty($pemasok->id)) {
-                $pemasok->id = (string) Str::uuid();
+            if (empty($pemasok->pemasok_id)) {
+                $pemasok->pemasok_id = (string) Str::uuid();
             }
         });
     }

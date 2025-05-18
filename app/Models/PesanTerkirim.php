@@ -11,15 +11,17 @@ class PesanTerkirim extends Model
     protected $keyType = 'string';
 
     protected $table = 'pesan_terkirim';
+    protected $primaryKey = 'pesan_terkirim_id';
+
 
     protected $casts = [
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'subjek',
-        'pesan',
+        'pesan_terkirim_id',
+        'subjek_pesan',
+        'isi_pesan',
         'user_id',
         'is_deleted',
     ];
@@ -27,8 +29,8 @@ class PesanTerkirim extends Model
     protected static function booted()
     {
         static::creating(function ($pesanan_terkirim) {
-            if (empty($pesanan_terkirim->id)) {
-                $pesanan_terkirim->id = (string) Str::uuid();
+            if (empty($pesanan_terkirim->pesan_terkirim_id)) {
+                $pesanan_terkirim->pesan_terkirim_id = (string) Str::uuid();
             }
         });
     }

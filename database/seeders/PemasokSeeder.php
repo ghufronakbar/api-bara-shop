@@ -17,24 +17,24 @@ class PemasokSeeder extends Seeder
         }
         $pemasoks = [
             [
-                'nama' => 'SRC Jayakarta',
-                'alamat' => 'Jakarta Selatan',
-                'telepon' => '6285156031385',
+                'nama_pemasok' => 'SRC Jayakarta',
+                'alamat_pemasok' => 'Jakarta Selatan',
+                'telepon_pemasok' => '6285156031385',
             ],
             [
-                'nama' => 'SRC Bandung',
-                'alamat' => 'Bandung',
-                'telepon' => '6285156031386',
+                'nama_pemasok' => 'SRC Bandung',
+                'alamat_pemasok' => 'Bandung',
+                'telepon_pemasok' => '6285156031386',
             ],
             [
-                'nama' => 'SRC Yogya',
-                'alamat' => 'Yogyakarta',
-                'telepon' => '6285156031387',
+                'nama_pemasok' => 'SRC Yogya',
+                'alamat_pemasok' => 'Yogyakarta',
+                'telepon_pemasok' => '6285156031387',
             ],
             [
-                'nama' => 'SRC Surabaya',
-                'alamat' => 'Surabaya',
-                'telepon' => '6285156031388',
+                'nama_pemasok' => 'SRC Surabaya',
+                'alamat_pemasok' => 'Surabaya',
+                'telepon_pemasok' => '6285156031388',
             ],
         ];
 

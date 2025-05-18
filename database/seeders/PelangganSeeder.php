@@ -17,13 +17,13 @@ class PelangganSeeder extends Seeder
         }
         $pelanggans = [
             [
-                'nama' => 'Lans The Prodigy',
-                'kode' => '6285156031385',
+                'nama_pelanggan' => 'Lans The Prodigy',
+                'kode_pelanggan' => '6285156031385',
                 'jenis_kode' => 'Phone',
             ],
             [
-                'nama' => 'Akane Kurokawa',
-                'kode' => 'lanstheprodigy@gmail.com',
+                'nama_pelanggan' => 'Akane Kurokawa',
+                'kode_pelanggan' => 'lanstheprodigy@gmail.com',
                 'jenis_kode' => 'Email',
             ],
         ];

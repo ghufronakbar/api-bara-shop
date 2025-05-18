@@ -13,6 +13,7 @@ class User extends Authenticatable
 
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $primaryKey = 'user_id';
 
     protected $table = 'users';
 
@@ -21,10 +22,11 @@ class User extends Authenticatable
     ];
 
     protected $fillable = [
-        'id',
-        'nama',
+        'user_id',
+        'nama_pengguna',
         'email',
         'password',
+        'foto_profil',
         'peran_id',
         'is_deleted',
     ];
@@ -36,8 +38,8 @@ class User extends Authenticatable
     protected static function booted()
     {
         static::creating(function ($user) {
-            if (empty($user->id)) {
-                $user->id = (string) Str::uuid();
+            if (empty($user->user_id)) {
+                $user->user_id = (string) Str::uuid();
             }
         });
     }

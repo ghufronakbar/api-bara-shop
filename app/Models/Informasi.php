@@ -11,25 +11,26 @@ class Informasi extends Model
     protected $keyType = 'string';
 
     protected $table = 'informasi';
+    protected $primaryKey = 'informasi_id';
 
     protected $casts = [
-        'pajak' => 'float',
-        'diskon' => 'float',
+        'persentase_pajak' => 'float',
+        'persentase_diskon' => 'float',
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'pajak',
-        'diskon',
+        'informasi_id',
+        'persentase_pajak',
+        'persentase_diskon',
         'is_deleted',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($pelanggan) {
-            if (empty($pelanggan->id)) {
-                $pelanggan->id = (string) Str::uuid();
+        static::creating(function ($informasi) {
+            if (empty($informasi->informasi_id)) {
+                $informasi->informasi_id = (string) Str::uuid();
             }
         });
     }

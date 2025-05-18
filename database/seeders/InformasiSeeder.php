@@ -17,8 +17,8 @@ class InformasiSeeder extends Seeder
         }
         $users = [
             [
-                'pajak' => 12,
-                'diskon' => 10,
+                'persentase_pajak' => 12,
+                'persentase_diskon' => 10,
             ],
         ];
 

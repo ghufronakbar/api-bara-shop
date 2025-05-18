@@ -12,18 +12,20 @@ class ItemPesanan extends Model
 
     protected $table = 'item_pesanan';
 
+    protected $primaryKey = 'item_pesanan_id';
+
     protected $casts = [
-        'jumlah' => 'float',
-        'harga' => 'float',
-        'total' => 'float',
+        'jumlah_barang' => 'float',
+        'harga_per_barang' => 'float',
+        'total_harga' => 'float',
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'jumlah',
-        'harga',
-        'total',
+        'item_pesanan_id',
+        'jumlah_barang',
+        'harga_per_barang',
+        'total_harga',
         'pesanan_id',
         'produk_id',
         'is_deleted',
@@ -32,8 +34,8 @@ class ItemPesanan extends Model
     protected static function booted()
     {
         static::creating(function ($item_pesanan) {
-            if (empty($item_pesanan->id)) {
-                $item_pesanan->id = (string) Str::uuid();
+            if (empty($item_pesanan->item_pesanan_id)) {
+                $item_pesanan->item_pesanan_id = (string) Str::uuid();
             }
         });
     }

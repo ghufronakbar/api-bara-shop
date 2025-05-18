@@ -12,19 +12,21 @@ class PembelianProduk extends Model
 
     protected $table = 'pembelian_produk';
 
+    protected $primaryKey = 'pembelian_produk_id';
+
     protected $casts = [
-        'jumlah' => 'float',
-        'harga' => 'float',
-        'total' => 'float',
+        'jumlah_pembelian' => 'float',
+        'harga_per_barang' => 'float',
+        'total_harga' => 'float',
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'jumlah',
-        'harga',
-        'total',
-        'deskripsi',
+        'pembelian_produk_id',
+        'jumlah_pembelian',
+        'harga_per_barang',
+        'total_harga',
+        'deskripsi_pembelian',
         'produk_id',
         'pemasok_id',
         'is_deleted',
@@ -33,8 +35,8 @@ class PembelianProduk extends Model
     protected static function booted()
     {
         static::creating(function ($pembelianProduk) {
-            if (empty($pembelianProduk->id)) {
-                $pembelianProduk->id = (string) Str::uuid();
+            if (empty($pembelianProduk->pembelian_produk_id)) {
+                $pembelianProduk->pembelian_produk_id = (string) Str::uuid();
             }
         });
     }

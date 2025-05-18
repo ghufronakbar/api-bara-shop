@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Peran;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -12,33 +13,38 @@ class UserSeeder extends Seeder
     {
 
         $check = User::count();
+        $perans = Peran::all();
         if ($check > 0) {
             return;
         }
+        $admin = Peran::where('nama_peran', 'Admin')->first();
+        $owner = Peran::where('nama_peran', 'Owner')->first();
+        $managerOperational = Peran::where('nama_peran', 'Manager Operational')->first();
+        $cashier = Peran::where('nama_peran', 'Kasir')->first();
         $users = [
             [
-                'nama' => 'Owner Satu',
+                'nama_pengguna' => 'Owner Satu',
                 'email' => 'owner@example.com',
                 'password' => Hash::make('12345678'),
-                'peran' => 'Owner',
+                'peran_id' => $owner->peran_id,
             ],
             [
-                'nama' => 'Admin Dua',
+                'nama_pengguna' => 'Admin Dua',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('12345678'),
-                'peran' => 'Admin',
+                'peran_id' => $admin->peran_id,
             ],
             [
-                'nama' => 'Manager Operasional',
+                'nama_pengguna' => 'Manager Operasional',
                 'email' => 'manager@example.com',
                 'password' => Hash::make('12345678'),
-                'peran' => 'ManagerOperational',
+                'peran_id' => $managerOperational->peran_id,
             ],
             [
-                'nama' => 'Kasir Empat',
+                'nama_pengguna' => 'Kasir Empat',
                 'email' => 'cashier@example.com',
                 'password' => Hash::make('12345678'),
-                'peran' => 'Cashier',
+                'peran_id' => $cashier->peran_id,
             ],
         ];
 

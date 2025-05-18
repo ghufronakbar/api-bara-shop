@@ -11,30 +11,32 @@ class Transaksi extends Model
     protected $keyType = 'string';
 
     protected $table = 'transaksi';
+    protected $primaryKey = 'transaksi_id';
+
 
     protected $casts = [
-        'jumlah' => 'float',
-        'detail' => 'array',
+        'jumlah_pembayaran' => 'float',
+        'detail_transaksi' => 'array',
         'is_deleted' => 'boolean',
     ];
 
     protected $fillable = [
-        'id',
-        'jumlah',
-        'metode',
-        'status',
-        'detail',
-        'snap_token',
-        'url_redirect',
+        'transaksi_id',
+        'jumlah_pembayaran',
+        'metode_pembayaran',
+        'status_pembayaran',
+        'detail_transaksi',
+        'midtrans_snap_token',
+        'midtrans_url_redirect',
         'pesanan_id',
         'is_deleted',
     ];
 
     protected static function booted()
     {
-        static::creating(function ($pesanan) {
-            if (empty($pesanan->id)) {
-                $pesanan->id = (string) Str::uuid();
+        static::creating(function ($transaksi) {
+            if (empty($transaksi->transaksi_id)) {
+                $transaksi->transaksi_id = (string) Str::uuid();
             }
         });
     }

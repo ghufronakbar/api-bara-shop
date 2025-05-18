@@ -146,14 +146,14 @@ class RingkasanController extends Controller
     public function getSoldProductOrderBySold(): array
     {
         $soldProducts = ItemPesanan::select(
-            'produk_id',
+            'item_pesanan.produk_id',
             DB::raw('MAX(produk.nama_produk) as nama'),
             DB::raw('MAX(produk.foto_produk) as gambar'),
             DB::raw('SUM(item_pesanan.jumlah_barang) as total_terjual')
         )
             ->join('produk', 'produk.produk_id', '=', 'item_pesanan.produk_id')
             ->where('item_pesanan.is_deleted', false)
-            ->groupBy('produk_id')
+            ->groupBy('item_pesanan.produk_id')
             ->orderByDesc(DB::raw('SUM(item_pesanan.jumlah_barang)'))
             ->get();
 

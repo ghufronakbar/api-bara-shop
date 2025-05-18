@@ -62,18 +62,18 @@ class LaporanController extends Controller
 
         foreach ($pesanans as $pesanan) {
             $sheet->setCellValue('A' . $row, $pesanan->nomor);
-            $sheet->setCellValue('B' . $row, $pesanan->id);
-            $sheet->setCellValue('C' . $row, $pesanan->pelanggan ? $pesanan->pelanggan->nama . ' (' . $pesanan->pelanggan->kode . ')' : '-');
-            $sheet->setCellValue('D' . $row, $pesanan->transaksi ? $pesanan->transaksi->metode : '-');
+            $sheet->setCellValue('B' . $row, $pesanan->pesanan_id);
+            $sheet->setCellValue('C' . $row, $pesanan->pelanggan ? $pesanan->pelanggan->nama_pelanggan . ' (' . $pesanan->pelanggan->kode_pelanggan . ')' : '-');
+            $sheet->setCellValue('D' . $row, $pesanan->transaksi ? $pesanan->transaksi->metode_pembayaran : '-');
 
             $produkData = $pesanan->item_pesanan->map(function ($item) {
-                return $item->produk->nama . ' x ' . $item->jumlah . ' (@' . number_format($item->harga, 0, ',', '.') . ')';
+                return $item->produk->nama_produk . ' x ' . $item->jumlah_produk . ' (@' . number_format($item->harga_per_barang, 0, ',', '.') . ')';
             })->join(', ');
             $sheet->setCellValue('E' . $row, $produkData);
 
-            $sheet->setCellValue('F' . $row, $pesanan->total_sementara);
-            $sheet->setCellValue('G' . $row, $pesanan->diskon . ' (' . $pesanan->persentase_diskon . '%)');
-            $sheet->setCellValue('H' . $row, $pesanan->pajak . ' (' . $pesanan->persentase_pajak . '%)');
+            $sheet->setCellValue('F' . $row, $pesanan->total_harga_barang);
+            $sheet->setCellValue('G' . $row, $pesanan->diskon_dikenakan . ' (' . $pesanan->persentase_diskon . '%)');
+            $sheet->setCellValue('H' . $row, $pesanan->pajak_dikenakan . ' (' . $pesanan->persentase_pajak . '%)');
             $sheet->setCellValue('I' . $row, $pesanan->total_akhir);
             $sheet->setCellValue('J' . $row, date('d-m-Y H:i:s', strtotime($pesanan->created_at)));
 
@@ -147,13 +147,13 @@ class LaporanController extends Controller
 
         foreach ($pembelianProduks as $item) {
             $sheet->setCellValue('A' . $row, $item->nomor);
-            $sheet->setCellValue('B' . $row, $item->id);
-            $sheet->setCellValue('C' . $row, $item->produk->nama);
-            $sheet->setCellValue('D' . $row, $item->pemasok->nama);
-            $sheet->setCellValue('E' . $row, $item->jumlah);
-            $sheet->setCellValue('F' . $row, $item->harga);
-            $sheet->setCellValue('G' . $row, $item->total);
-            $sheet->setCellValue('H' . $row, $item->deskripsi);
+            $sheet->setCellValue('B' . $row, $item->pembelian_produk_id);
+            $sheet->setCellValue('C' . $row, $item->produk->nama_produk);
+            $sheet->setCellValue('D' . $row, $item->pemasok->nama_pemasok);
+            $sheet->setCellValue('E' . $row, $item->jumlah_pembelian);
+            $sheet->setCellValue('F' . $row, $item->harga_per_barang);
+            $sheet->setCellValue('G' . $row, $item->total_harga);
+            $sheet->setCellValue('H' . $row, $item->deskripsi_pembelian);
             $sheet->setCellValue('I' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
 
             $row++;
@@ -223,10 +223,10 @@ class LaporanController extends Controller
 
         foreach ($cacatProduks as $item) {
             $sheet->setCellValue('A' . $row, $item->nomor);
-            $sheet->setCellValue('B' . $row, $item->id);
-            $sheet->setCellValue('C' . $row, $item->produk->nama);
-            $sheet->setCellValue('D' . $row, $item->jumlah);
-            $sheet->setCellValue('E' . $row, $item->alasan);
+            $sheet->setCellValue('B' . $row, $item->cacat_produk_id);
+            $sheet->setCellValue('C' . $row, $item->produk->nama_produk);
+            $sheet->setCellValue('D' . $row, $item->jumlah_produk);
+            $sheet->setCellValue('E' . $row, $item->alasan_kerusakan);
             $sheet->setCellValue('F' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
 
             $row++;
@@ -250,7 +250,7 @@ class LaporanController extends Controller
         });
 
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Pembelian ' . env('APP_NAME') . '.xlsx"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="Laporan Kerusakan ' . env('APP_NAME') . '.xlsx"');
         $response->headers->set('Cache-Control', 'no-cache');
 
         return $response;
@@ -265,9 +265,9 @@ class LaporanController extends Controller
 
         $nomor = 1;
         foreach ($produks as $produk) {
-            $produk->total_terjual = $items_pesanan->where('produk_id', $produk->id)->sum('jumlah');
-            $produk->total_cacat = $cacats->where('produk_id', $produk->id)->sum('jumlah');
-            $produk->total_pembelian = $pembelians->where('produk_id', $produk->id)->sum('jumlah');
+            $produk->total_terjual = $items_pesanan->where('produk_id', $produk->produk_id)->sum('jumlah_barang');
+            $produk->total_cacat = $cacats->where('produk_id', $produk->produk_id)->sum('jumlah_produk');
+            $produk->total_pembelian = $pembelians->where('produk_id', $produk->id)->sum('jumlah_pembelian');
             $produk->nomor = $nomor;
             $nomor++;
         }
@@ -292,16 +292,16 @@ class LaporanController extends Controller
 
         foreach ($produks as $item) {
             $sheet->setCellValue('A' . $row, $item->nomor);
-            $sheet->setCellValue('B' . $row, $item->id);
-            $sheet->setCellValue('C' . $row, $item->nama);
-            $sheet->setCellValue('D' . $row, $item->kategori);
-            $sheet->setCellValue('E' . $row, $item->harga);
+            $sheet->setCellValue('B' . $row, $item->produk_id);
+            $sheet->setCellValue('C' . $row, $item->nama_produk);
+            $sheet->setCellValue('D' . $row, $item->kategori_produk);
+            $sheet->setCellValue('E' . $row, $item->harga_produk);
             $sheet->setCellValue('F' . $row, $item->hpp);
-            $sheet->setCellValue('G' . $row, $item->jumlah);
+            $sheet->setCellValue('G' . $row, $item->jumlah_stok);
             $sheet->setCellValue('H' . $row, $item->total_terjual);
             $sheet->setCellValue('I' . $row, $item->total_pembelian);
             $sheet->setCellValue('J' . $row, $item->total_cacat);
-            $sheet->setCellValue('K' . $row, $item->deskripsi ?: '-');
+            $sheet->setCellValue('K' . $row, $item->deskripsi_produk ?: '-');
             $sheet->setCellValue('L' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
 
             $row++;
@@ -357,10 +357,10 @@ class LaporanController extends Controller
 
         foreach ($pelanggans as $item) {
             $sheet->setCellValue('A' . $row, $item->nomor);
-            $sheet->setCellValue('B' . $row, $item->id);
-            $sheet->setCellValue('C' . $row, $item->nama);
+            $sheet->setCellValue('B' . $row, $item->pelanggan_id);
+            $sheet->setCellValue('C' . $row, $item->nama_pelanggan);
             $sheet->setCellValue('D' . $row, $item->jenis_kode);
-            $sheet->setCellValue('E' . $row, $item->kode);
+            $sheet->setCellValue('E' . $row, $item->kode_pelanggan);
             $sheet->setCellValue('F' . $row, $item->pesanan_count);
             $sheet->setCellValue('G' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
 
@@ -415,9 +415,9 @@ class LaporanController extends Controller
 
         foreach ($pemasoks as $item) {
             $sheet->setCellValue('A' . $row, $item->nomor);
-            $sheet->setCellValue('B' . $row, $item->id);
-            $sheet->setCellValue('C' . $row, $item->nama);
-            $sheet->setCellValue('D' . $row, $item->telepon);
+            $sheet->setCellValue('B' . $row, $item->pemasok_id);
+            $sheet->setCellValue('C' . $row, $item->nama_pemasok);
+            $sheet->setCellValue('D' . $row, $item->telepon_pemasok);
             $sheet->setCellValue('E' . $row, $item->pembelian_produk_count);
             $sheet->setCellValue('F' . $row, date('d-m-Y H:i:s', strtotime($item->created_at)));
 

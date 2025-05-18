@@ -48,16 +48,16 @@ class Pesanan extends Model
 
     public function pelanggan()
     {
-        return $this->belongsTo(Pelanggan::class);
+        return $this->belongsTo(Pelanggan::class, 'pelanggan_id', 'pelanggan_id');
     }
 
     public function item_pesanan()
     {
-        return $this->hasMany(ItemPesanan::class);
+        return $this->hasMany(ItemPesanan::class, 'pesanan_id', 'pesanan_id');
     }
 
     public function transaksi()
     {
-        return $this->hasOne(Transaksi::class);
+        return $this->hasOne(Transaksi::class, 'pesanan_id', 'pesanan_id');
     }
 }

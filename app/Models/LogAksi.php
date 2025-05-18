@@ -23,7 +23,6 @@ class LogAksi extends Model
         'log_aksi_id',
         'deskripsi_aksi',
         'detail_aksi',
-        'referensi_id',
         'model_referensi',
         'jenis_aksi',
         'user_id',
@@ -42,6 +41,6 @@ class LogAksi extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }

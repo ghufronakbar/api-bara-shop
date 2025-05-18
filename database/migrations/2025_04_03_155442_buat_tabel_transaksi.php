@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transaksi', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->uuid('transaksi_id')->primary();
             $table->float('jumlah_pembayaran');
             $table->enum('metode_pembayaran', ['Cash', 'VirtualAccountOrBank']);
             $table->enum('status_pembayaran', ['Pending', 'Success']);

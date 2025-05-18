@@ -23,7 +23,7 @@ class PelangganController extends Controller
     {
         $pelanggan = Pelanggan::withCount([])
             ->where('is_deleted', false)
-            ->orderBy('nama', 'asc')
+            ->orderBy('nama_pelanggan', 'asc')
             ->get();
 
         return response()->json([
@@ -46,7 +46,7 @@ class PelangganController extends Controller
             ], 400);
         }
 
-        $checkCode = Pelanggan::where('kode', $request->kode)->first();
+        $checkCode = Pelanggan::where('kode_pelanggan', $request->kode)->first();
 
         if ($checkCode) {
             return response()->json([
@@ -69,8 +69,8 @@ class PelangganController extends Controller
         $validated = $validator->validated();
 
         $pelanggan = Pelanggan::create([
-            'nama' => $validated['nama'],
-            'kode' => $validated['kode'],
+            'nama_pelanggan' => $validated['nama'],
+            'kode_pelanggan' => $validated['kode'],
             'jenis_kode' => $jenis_kode,
             'is_deleted' => false,
         ]);
@@ -97,7 +97,7 @@ class PelangganController extends Controller
             ], 400);
         }
 
-        $pelanggan = Pelanggan::where('kode', $id)->first();
+        $pelanggan = Pelanggan::where('kode_pelanggan', $id)->first();
 
         if (!$pelanggan || $pelanggan->is_deleted) {
             return response()->json([
@@ -126,7 +126,7 @@ class PelangganController extends Controller
             ], 400);
         }
 
-        $pelanggan = Pelanggan::where('id', $id)->select('id', 'is_deleted')->first();
+        $pelanggan = Pelanggan::where('pelanggan_id', $id)->first();
 
         if (!$pelanggan || $pelanggan->is_deleted) {
             return response()->json([
@@ -136,9 +136,9 @@ class PelangganController extends Controller
 
         $validated = $validator->validated();
 
-        $checkCode = Pelanggan::where('kode', $request->kode)->first();
+        $checkCode = Pelanggan::where('kode_pelanggan', $request->kode)->first();
 
-        if ($checkCode && $checkCode->id != $id) {
+        if ($checkCode && $checkCode->pelanggan_id != $id) {
             return response()->json([
                 'message' => 'Pelanggan sudah terdaftar'
             ], 400);
@@ -183,7 +183,7 @@ class PelangganController extends Controller
             ], 400);
         }
 
-        $pelanggan = Pelanggan::where('id', $id)->first();
+        $pelanggan = Pelanggan::where('pelanggan_id', $id)->first();
 
         if (!$pelanggan || $pelanggan->is_deleted) {
             return response()->json([

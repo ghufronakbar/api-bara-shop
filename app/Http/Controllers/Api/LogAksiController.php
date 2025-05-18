@@ -28,7 +28,7 @@ class LogAksiController extends Controller
 
             $decoded = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key(env('JWT_SECRET'), 'HS256'));
 
-            if (!$decoded->id || !$decoded->peran) {
+            if (!$decoded->user_id || !$decoded->peran) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
@@ -39,11 +39,11 @@ class LogAksiController extends Controller
             $user = User::with('peran')->get();
 
             foreach ($logAksi as $log) {
-                $log->user = $user->where('id', $log->user_id)->first();
+                $log->user = $user->where('user_id', $log->user_id)->first();
                 try {
-                    $log->detail = json_decode($log->detail);
+                    $log->detail_aksi = json_decode($log->detail_aksi);
                 } catch (\Throwable $th) {
-                    $log->detail = $log->detail;
+                    $log->detail_aksi = $log->detail_aksi;
                 }
             };
 

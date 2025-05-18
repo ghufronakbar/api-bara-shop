@@ -29,7 +29,7 @@ class CacatProdukController extends Controller
         $produk = Produk::get();
 
         foreach ($cacatProduk as $cacat) {
-            $filterProduk = $produk->where('id', $cacat->produk_id)->first();
+            $filterProduk = $produk->where('produk_id', $cacat->produk_id)->first();
             $cacat->produk = $filterProduk ? $filterProduk->toArray() : null;
         }
 
@@ -54,7 +54,7 @@ class CacatProdukController extends Controller
             ], 400);
         }
 
-        $checkProduk = Produk::where('id', $request->produk_id)->first();
+        $checkProduk = Produk::where('produk_id', $request->produk_id)->first();
 
         if (!$checkProduk || $checkProduk->is_deleted) {
             return response()->json([
@@ -65,15 +65,15 @@ class CacatProdukController extends Controller
 
         $validated = $validator->validated();
 
-        $newAmount = $checkProduk->jumlah - $validated['jumlah'];
+        $newAmount = $checkProduk->jumlah_stok - $validated['jumlah'];
 
-        Produk::where('id', $request->produk_id)->update([
-            'jumlah' => $newAmount
+        Produk::where('produk_id', $request->produk_id)->update([
+            'jumlah_stok' => $newAmount
         ]);
 
         $cacatProduk = CacatProduk::create([
-            'jumlah' => $validated['jumlah'],
-            'alasan' => $validated['alasan'],
+            'jumlah_produk' => $validated['jumlah'],
+            'alasan_kerusakan' => $validated['alasan'],
             'produk_id' => $validated['produk_id'],
             'is_deleted' => false,
         ]);
@@ -100,7 +100,7 @@ class CacatProdukController extends Controller
             ], 400);
         }
 
-        $cacatProduk = CacatProduk::where('id', $id)->first();
+        $cacatProduk = CacatProduk::where('cacat_produk_id', $id)->first();
 
         if (!$cacatProduk || $cacatProduk->is_deleted) {
             return response()->json([
@@ -108,7 +108,7 @@ class CacatProdukController extends Controller
             ], 404);
         }
 
-        $produk = Produk::where('id', $cacatProduk->produk_id)->first();
+        $produk = Produk::where('produk_id', $cacatProduk->produk_id)->first();
 
         $cacatProduk->produk = $produk;
 
@@ -133,9 +133,9 @@ class CacatProdukController extends Controller
             ], 400);
         }
 
-        $checkCacatProduk = CacatProduk::where('cacat_produk.id', $id)
-            ->join('produk', 'cacat_produk.produk_id', '=', 'produk.id')
-            ->select('cacat_produk.jumlah as cacat_jumlah', 'produk.jumlah as produk_jumlah', 'produk.id as produk_id')
+        $checkCacatProduk = CacatProduk::where('cacat_produk.cacat_produk_id', $id)
+            ->join('produk', 'cacat_produk.produk_id', '=', 'produk.produk_id')
+            ->select('cacat_produk.jumlah_produk as cacat_jumlah', 'produk.jumlah_stok as produk_jumlah', 'produk.produk_id as produk_id')
             ->first();
 
         if (!$checkCacatProduk || $checkCacatProduk->is_deleted) {
@@ -149,17 +149,17 @@ class CacatProdukController extends Controller
         $gapAmount = $checkCacatProduk->cacat_jumlah - $validated['jumlah'];
         $newAmount = $checkCacatProduk->produk_jumlah + $gapAmount;
 
-        Produk::where('id', $checkCacatProduk->produk_id)->update([
-            'jumlah' => $newAmount
+        Produk::where('produk_id', $checkCacatProduk->produk_id)->update([
+            'jumlah_stok' => $newAmount
         ]);
 
-        $cacatProduk = CacatProduk::where('id', $id)->update([
-            'jumlah' => $validated['jumlah'],
-            'alasan' => $validated['alasan'],
+        $cacatProduk = CacatProduk::where('cacat_produk_id', $id)->update([
+            'jumlah_produk' => $validated['jumlah'],
+            'alasan_kerusakan' => $validated['alasan'],
             'is_deleted' => false,
         ]);
 
-        $cacatProduk = CacatProduk::where('id', $id)->first();
+        $cacatProduk = CacatProduk::where('cacat_produk_id', $id)->first();
 
         $this->logService->saveToLog($request, 'CacatProduk', $cacatProduk->toArray());
 
@@ -182,9 +182,9 @@ class CacatProdukController extends Controller
             ], 400);
         }
 
-        $checkCacatProduk = CacatProduk::where('cacat_produk.id', $id)
-            ->join('produk', 'cacat_produk.produk_id', '=', 'produk.id')
-            ->select('cacat_produk.jumlah as cacat_jumlah', 'produk.jumlah as produk_jumlah', 'produk.id as produk_id')
+        $checkCacatProduk = CacatProduk::where('cacat_produk.cacat_produk_id', $id)
+            ->join('produk', 'cacat_produk.produk_id', '=', 'produk.produk_id')
+            ->select('cacat_produk.jumlah_produk as cacat_jumlah', 'produk.jumlah_stok as produk_jumlah', 'produk.produk_id as produk_id')
             ->first();
 
         if (!$checkCacatProduk || $checkCacatProduk->is_deleted) {
@@ -193,14 +193,14 @@ class CacatProdukController extends Controller
             ], 404);
         }
 
-        CacatProduk::where('id', $id)->update([
+        CacatProduk::where('cacat_produk_id', $id)->update([
             'is_deleted' => true
         ]);
 
         $newAmount = $checkCacatProduk->produk_jumlah + $checkCacatProduk->cacat_jumlah;
 
-        Produk::where('id', $checkCacatProduk->produk_id)->update([
-            'jumlah' => $newAmount
+        Produk::where('produk_id', $checkCacatProduk->produk_id)->update([
+            'jumlah_stok' => $newAmount
         ]);
 
         $this->logService->saveToLog($request, 'CacatProduk', $checkCacatProduk->toArray());

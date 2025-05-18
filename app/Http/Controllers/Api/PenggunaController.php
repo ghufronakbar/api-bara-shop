@@ -28,7 +28,7 @@ class PenggunaController extends Controller
     {
         $user = User::with(["peran"])
             ->where('is_deleted', false)
-            ->orderBy('nama', 'asc')
+            ->orderBy('nama_pengguna', 'asc')
             ->get();
 
         return response()->json([
@@ -63,7 +63,7 @@ class PenggunaController extends Controller
         }
 
 
-        $checkPeran = Peran::where('id', $validated['peran_id'])->first();
+        $checkPeran = Peran::where('peran_id', $validated['peran_id'])->first();
 
         if (!$checkPeran || $checkPeran->is_deleted) {
             return response()->json([
@@ -78,7 +78,7 @@ class PenggunaController extends Controller
 
         // Membuat user baru
         $user = User::create([
-            'nama' => $validated['nama'],
+            'nama_pengguna' => $validated['nama'],
             'email' => $validated['email'],
             'peran_id' => $validated['peran_id'],
             'password' => $hashedPassword,
@@ -86,7 +86,7 @@ class PenggunaController extends Controller
         ]);
 
         // Mengirim email
-        Mail::to($validated['email'])->send(new EmailPembuatan($user->nama, $password));
+        Mail::to($validated['email'])->send(new EmailPembuatan($user->nama_pengguna, $password));
 
         $this->logService->saveToLog($request, 'User', $user->toArray());
 
@@ -109,7 +109,7 @@ class PenggunaController extends Controller
             ], 400);
         }
 
-        $user = User::with('peran')->where('id', $id)->first();
+        $user = User::with('peran')->where('user_id', $id)->first();
 
         if (!$user || $user->is_deleted) {
             return response()->json([
@@ -139,7 +139,7 @@ class PenggunaController extends Controller
 
         $validated = $validator->validated();
 
-        $checkPeran = Peran::where('id', $validated['peran_id'])->first();
+        $checkPeran = Peran::where('peran_id', $validated['peran_id'])->first();
 
         if (!$checkPeran || $checkPeran->is_deleted) {
             return response()->json([
@@ -147,7 +147,7 @@ class PenggunaController extends Controller
             ], 400);
         }
 
-        $user = User::where('id', $id)->first();
+        $user = User::where('user_id', $id)->first();
 
         if (!$user || $user->is_deleted) {
             return response()->json([
@@ -161,7 +161,7 @@ class PenggunaController extends Controller
             'peran_id' => $validated['peran_id'],
         ]);
 
-        Mail::to($user->email)->send(new EmailPeranBaru($user->nama, $checkPeran->nama));
+        Mail::to($user->email)->send(new EmailPeranBaru($user->nama_pengguna, $checkPeran->nama_peran));
 
         $this->logService->saveToLog($request, 'User', $user->toArray());
 
@@ -184,7 +184,7 @@ class PenggunaController extends Controller
             ], 400);
         }
 
-        $user = User::where('id', $id)->first();
+        $user = User::where('user_id', $id)->first();
 
         if (!$user || $user->is_deleted) {
             return response()->json([
@@ -192,7 +192,7 @@ class PenggunaController extends Controller
             ], 404);
         }
 
-        Mail::to($user->email)->send(new EmailPenghapusan($user->nama));
+        Mail::to($user->email)->send(new EmailPenghapusan($user->nama_pengguna));
 
         $user->update(['is_deleted' => true]);
 

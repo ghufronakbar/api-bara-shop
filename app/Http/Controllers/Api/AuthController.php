@@ -31,7 +31,7 @@ class AuthController extends Controller
         }
 
         // Cek email
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('peran')->where('email', $request->email)->first();
         if (!$user || $user->is_deleted) {
             return response()->json([
                 'message' => 'Email tidak ditemukan'
@@ -47,9 +47,9 @@ class AuthController extends Controller
 
         // Payload JWT
         $payload = [
-            'id' => $user->id,
-            'nama' => $user->nama,
-            'gambar' => $user->gambar,
+            'user_id' => $user->user_id,
+            'nama_pengguna' => $user->nama_pengguna,
+            'foto_profil' => $user->foto_profil,
             'email' => $user->email,
             'peran' => $user->peran,
             'exp' => now()->addDays(1)->timestamp,
@@ -60,10 +60,10 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login berhasil!',
             'data' => [
-                'id' => $user->id,
-                'nama' => $user->nama,
+                'user_id' => $user->user_id,
+                'nama_pengguna' => $user->nama_pengguna,
                 'email' => $user->email,
-                'gambar' => $user->gambar,
+                'foto_profil' => $user->foto_profil,
                 'peran' => $user->peran,
                 'token' => $token,
             ]

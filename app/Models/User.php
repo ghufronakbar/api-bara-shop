@@ -46,12 +46,11 @@ class User extends Authenticatable
 
     public function log_aksi()
     {
-        return $this->hasMany(LogAksi::class);
+        return $this->hasMany(LogAksi::class, 'user_id', 'user_id');
     }
 
     public function peran()
-{
-    return $this->belongsTo(Peran::class);
-}
-
+    {
+        return $this->belongsTo(Peran::class, 'peran_id', 'peran_id');
+    }
 }

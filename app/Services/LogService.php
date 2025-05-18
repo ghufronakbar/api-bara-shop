@@ -72,7 +72,7 @@ class LogService
                 case 'CacatProduk':
                     $modelDesc = 'kerusakan produk';
                     break;
-                case 'Pesan Terkirim':
+                case 'PesanTerkirim':
                     $modelDesc = 'pesan terkirim';
                     break;
                 case 'Informasi':
@@ -83,30 +83,28 @@ class LogService
             }
 
             // Ambil data pengguna yang sedang melakukan aksi
-            $id = $decoded->id;
+            $id = $decoded->user_id;
             $user = User::with('peran')->find($id);
             if (!$user) {
                 throw new \Exception('Unauthorized');
             }
 
             $description = sprintf(
-                '%s (%s) %s %s dengan id %s',
-                $user->nama,
-                $user->peran->nama,
+                '%s (%s) %s %s',
+                $user->nama_pengguna,
+                $user->peran->nama_peran,
                 $model === 'Informasi' ? 'mengedit' : $actionDesc,
                 $modelDesc,
-                $detail['id']
             );
 
             // Simpan log
             LogAksi::create([
-                'id' => (string) Str::uuid(),
-                'deskripsi' => $description,
-                'detail' => json_encode($detail),
-                'referensi_id' => $detail['id'],
+                'log_aksi_id' => (string) Str::uuid(),
+                'deskripsi_aksi' => $description,
+                'detail_aksi' => json_encode($detail),
                 'model_referensi' => $model,
-                'aksi' => $action,
-                'user_id' => $user->id,
+                'jenis_aksi' => $action,
+                'user_id' => $user->user_id,
                 'is_deleted' => false,
             ]);
         } catch (\Exception $e) {

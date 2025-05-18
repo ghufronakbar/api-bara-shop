@@ -28,21 +28,21 @@ class AkunController extends Controller
         try {
             $decoded = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key(env('JWT_SECRET'), 'HS256'));
 
-            if (!$decoded->id) {
+            if (!$decoded->user_id) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
-            $user = User::with('peran')->find($decoded->id);
+            $user = User::with('peran')->find($decoded->user_id);
 
             if (!$user) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
             $payload = [
-                'id' => $user->id,
-                'nama' => $user->nama,
+                'user_id' => $user->user_id,
+                'nama_pengguna' => $user->nama_pengguna,
                 'email' => $user->email,
-                'gambar' => $user->gambar,
+                'foto_profil' => $user->foto_profil,
                 'peran' => $user->peran,
                 'exp' => now()->addDays(1)->timestamp,
             ];
@@ -89,29 +89,29 @@ class AkunController extends Controller
         try {
             $decoded = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key(env('JWT_SECRET'), 'HS256'));
 
-            if (!$decoded->id) {
+            if (!$decoded->user_id) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
-            $user = User::find($decoded->id);
+            $user = User::find($decoded->user_id);
             $checkEmail = User::where('email', $request->email)->first();
 
-            if ($checkEmail && $checkEmail->id != $user->id) {
+            if ($checkEmail && $checkEmail->user_id != $user->user_id) {
                 return response()->json([
                     'message' => 'Email sudah terdaftar'
                 ], 400);
             }
 
             $user->email = $request->email;
-            $user->nama = $request->nama;
-            $user->gambar = $request->gambar;
+            $user->nama_pengguna = $request->nama;
+            $user->foto_profil = $request->gambar;
             $user->save();
 
             $payload = [
-                'id' => $user->id,
-                'nama' => $user->nama,
+                'user_id' => $user->user_id,
+                'nama_pengguna' => $user->nama_pengguna,
                 'email' => $user->email,
-                'gambar' => $user->gambar,
+                'foto_profil' => $user->foto_profil,
                 'peran' => $user->peran,
                 'exp' => now()->addDays(1)->timestamp,
             ];
@@ -125,10 +125,10 @@ class AkunController extends Controller
             return response()->json([
                 'message' => 'OK',
                 'data' => [
-                    'id' => $user->id,
-                    'nama' => $user->nama,
+                    'user_id' => $user->user_id,
+                    'nama_pengguna' => $user->nama_pengguna,
                     'email' => $user->email,
-                    'gambar' => $user->gambar,
+                    'foto_profil' => $user->foto_profil,
                     'peran' => $user->peran,
                     'token' => $token,
                 ]
@@ -164,11 +164,11 @@ class AkunController extends Controller
         try {
             $decoded = JWT::decode($token, new \Firebase\JWT\Key(env('JWT_SECRET'), 'HS256'));
 
-            if (!$decoded->id) {
+            if (!$decoded->user_id) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
 
-            $user = User::find($decoded->id);
+            $user = User::find($decoded->user_id);
 
             if (!$user) {
                 return response()->json(['message' => 'Unauthorized'], 401);
@@ -192,10 +192,10 @@ class AkunController extends Controller
             return response()->json([
                 'message' => 'Berhasil mengubah password',
                 'data' => [
-                    'id' => $user->id,
-                    'nama' => $user->nama,
+                    'user_id' => $user->user_id,
+                    'nama_pengguna' => $user->nama_pengguna,
                     'email' => $user->email,
-                    'gambar' => $user->gambar,
+                    'foto_profil' => $user->foto_profil,
                     'peran' => $user->peran,
                 ]
             ]);

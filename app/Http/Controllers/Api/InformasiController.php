@@ -47,9 +47,19 @@ class InformasiController extends Controller
         $informasi = Informasi::first();
 
         if (!$informasi) {
-            Informasi::create($validated);
+            Informasi::create(
+                [
+                    'persentase_pajak' => $validated['pajak'],
+                    'persentase_diskon' => $validated['diskon'],
+                ]
+            );
         } else {
-            $informasi->update($validated);
+            $informasi->update(
+                [
+                    'persentase_pajak' => $validated['pajak'],
+                    'persentase_diskon' => $validated['diskon'],
+                ]
+            );
         }
 
         $this->logService->saveToLog($request, 'Informasi', $informasi->toArray());

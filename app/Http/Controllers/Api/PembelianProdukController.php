@@ -23,8 +23,7 @@ class PembelianProdukController extends Controller
 
     public function index()
     {
-        $pembelianProduk = PembelianProduk::withCount([])
-            ->where('is_deleted', false)
+        $pembelianProduk = PembelianProduk::where('is_deleted', false)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -32,10 +31,10 @@ class PembelianProdukController extends Controller
         $pemasok = Pemasok::get();
 
         foreach ($pembelianProduk as $pembelian) {
-            $filterProduk = $produk->where('id', $pembelian->produk_id)->first();
+            $filterProduk = $produk->where('produk_id', $pembelian->produk_id)->first();
             $pembelian->produk = $filterProduk ? $filterProduk->toArray() : null;
 
-            $filterPemasok = $pemasok->where('id', $pembelian->pemasok_id)->first();
+            $filterPemasok = $pemasok->where('pemasok_id', $pembelian->pemasok_id)->first();
             $pembelian->pemasok = $filterPemasok ? $filterPemasok->toArray() : null;
         }
 
@@ -64,7 +63,7 @@ class PembelianProdukController extends Controller
         }
 
         // Cek produk
-        $checkProduk = Produk::where('id', $request->produk_id)->first();
+        $checkProduk = Produk::where('produk_id', $request->produk_id)->first();
         if (!$checkProduk || $checkProduk->is_deleted) {
             return response()->json([
                 'message' => 'Produk tidak ditemukan atau telah dihapus'
@@ -72,7 +71,7 @@ class PembelianProdukController extends Controller
         }
 
         // Cek pemasok
-        $checkPemasok = Pemasok::where('id', $request->pemasok_id)->first();
+        $checkPemasok = Pemasok::where('pemasok_id', $request->pemasok_id)->first();
         if (!$checkPemasok || $checkPemasok->is_deleted) {
             return response()->json([
                 'message' => 'Pemasok tidak ditemukan atau telah dihapus'
@@ -87,10 +86,10 @@ class PembelianProdukController extends Controller
 
         // Simpan data pembelian produk
         $pembelianProduk = PembelianProduk::create([
-            'jumlah' => $validated['jumlah'],
-            'total' => $validated['total'],
-            'harga' => $harga,
-            'deskripsi' => $validated['deskripsi'],
+            'jumlah_pembelian' => $validated['jumlah'],
+            'total_harga' => $validated['total'],
+            'harga_per_barang' => $harga,
+            'deskripsi_pembelian' => $validated['deskripsi'],
             'produk_id' => $validated['produk_id'],
             'pemasok_id' => $validated['pemasok_id'],
         ]);
@@ -106,23 +105,23 @@ class PembelianProdukController extends Controller
         $amountPurchase = 0;
 
         foreach ($pembelianProduks as $pembelian) {
-            $totalPurchase += $pembelian->total;
-            $amountPurchase += $pembelian->jumlah;
+            $totalPurchase += $pembelian->total_harga;
+            $amountPurchase += $pembelian->jumlah_pembelian;
         }
 
         // Hitung  HPP baru
         $hpp = $totalPurchase / $amountPurchase;
 
         // Update stok produk dan COGS
-        $newAmount = $checkProduk->jumlah + $validated['jumlah'];
+        $newAmount = $checkProduk->jumlah_stok + $validated['jumlah'];
 
         $checkProduk->update([
-            'jumlah' => $newAmount,
+            'jumlah_stok' => $newAmount,
             'hpp' => $hpp,
         ]);
 
         // Simpan log pembelian produk
-        $this->logService->saveToLog($request, 'Pembelian Produk', $pembelianProduk->toArray());
+        $this->logService->saveToLog($request, 'PembelianProduk', $pembelianProduk->toArray());
 
         return response()->json([
             'message' => 'Berhasil menambahkan pembelian produk',
@@ -144,7 +143,7 @@ class PembelianProdukController extends Controller
             ], 400);
         }
 
-        $pembelianProduk = PembelianProduk::where('id', $id)->first();
+        $pembelianProduk = PembelianProduk::where('pembelian_produk_id', $id)->first();
 
         if (!$pembelianProduk || $pembelianProduk->is_deleted) {
             return response()->json([
@@ -152,10 +151,10 @@ class PembelianProdukController extends Controller
             ], 404);
         }
 
-        $produk = Produk::where('id', $pembelianProduk->produk_id)->first();
+        $produk = Produk::where('produk_id', $pembelianProduk->produk_id)->first();
         $pembelianProduk->produk = $produk;
 
-        $pemasok = Pemasok::where('id', $pembelianProduk->pemasok_id)->first();
+        $pemasok = Pemasok::where('pemasok_id', $pembelianProduk->pemasok_id)->first();
         $pembelianProduk->pemasok = $pemasok;
 
         return response()->json([
@@ -182,7 +181,7 @@ class PembelianProdukController extends Controller
             ], 400);
         }
 
-        $check = PembelianProduk::where('id', $id)->first();
+        $check = PembelianProduk::where('pembelian_produk_id', $id)->first();
         if (!$check || $check->is_deleted) {
             return response()->json([
                 'message' => 'Data tidak ditemukan'
@@ -190,7 +189,7 @@ class PembelianProdukController extends Controller
         }
 
         // Cek produk
-        $checkProduk = Produk::where('id', $check->produk_id)->first();
+        $checkProduk = Produk::where('produk_id', $check->produk_id)->first();
         if (!$checkProduk || $checkProduk->is_deleted) {
             return response()->json([
                 'message' => 'Produk tidak ditemukan atau telah dihapus'
@@ -198,7 +197,7 @@ class PembelianProdukController extends Controller
         }
 
         // Cek pemasok
-        $checkPemasok = Pemasok::where('id', $request->pemasok_id)->first();
+        $checkPemasok = Pemasok::where('pemasok_id', $request->pemasok_id)->first();
         if (!$checkPemasok || $checkPemasok->is_deleted) {
             return response()->json([
                 'message' => 'Pemasok tidak ditemukan atau telah dihapus'
@@ -211,14 +210,14 @@ class PembelianProdukController extends Controller
         // Hitung total pembelian
         $harga = $validated['total'] / $validated['jumlah'];
 
-        $totalBeforeUpdate = $check->jumlah;
+        $totalBeforeUpdate = $check->jumlah_pembelian;
 
         // Simpan data pembelian produk
         $check->update([
-            'jumlah' => $validated['jumlah'],
-            'total' => $validated['total'],
+            'jumlah_pembelian' => $validated['jumlah'],
+            'total_harga' => $validated['total'],
             'harga' => $harga,
-            'deskripsi' => $validated['deskripsi'],
+            'deskripsi_pembelian' => $validated['deskripsi'],
             'pemasok_id' => $validated['pemasok_id'],
         ]);
 
@@ -233,8 +232,8 @@ class PembelianProdukController extends Controller
         $amountPurchase = 0;
 
         foreach ($pembelianProduks as $pembelian) {
-            $totalPurchase += $pembelian->total;
-            $amountPurchase += $pembelian->jumlah;
+            $totalPurchase += $pembelian->total_harga;
+            $amountPurchase += $pembelian->jumlah_pembelian;
         }
 
         // Hitung  HPP baru
@@ -242,18 +241,22 @@ class PembelianProdukController extends Controller
 
         // Update stok produk dan COGS
         $gapAmount = $validated['jumlah'] - $totalBeforeUpdate;
-        $newAmount = $checkProduk->jumlah + $gapAmount;
+        $newAmount = $checkProduk->jumlah_stok + $gapAmount;
 
         $checkProduk->update([
-            'jumlah' => $newAmount,
+            'jumlah_stok' => $newAmount,
             'hpp' => $hpp,
         ]);
 
         // Simpan log pembelian produk
-        $this->logService->saveToLog($request, 'Pembelian Produk', $check->toArray());
+        $this->logService->saveToLog($request, 'PembelianProduk', $check->toArray());
 
         return response()->json([
             'message' => 'Berhasil mengedit pembelian produk',
+            'debug' => [
+                'gapAmount' => $gapAmount,
+                'newAmount' => $newAmount
+            ],
             'data' => $check
         ], 201);
     }
@@ -271,7 +274,7 @@ class PembelianProdukController extends Controller
             ], 400);
         }
 
-        $pembelianProduk = PembelianProduk::where('id', $id)->first();
+        $pembelianProduk = PembelianProduk::where('pembelian_produk_id', $id)->first();
 
         if (!$pembelianProduk || $pembelianProduk->is_deleted) {
             return response()->json([
@@ -279,7 +282,7 @@ class PembelianProdukController extends Controller
             ], 404);
         }
 
-        PembelianProduk::where('id', $id)->update([
+        PembelianProduk::where('pembelian_produk_id', $id)->update([
             'is_deleted' => true
         ]);
 
@@ -294,20 +297,20 @@ class PembelianProdukController extends Controller
         $amountPurchase = 0;
 
         foreach ($pembelianProduks as $pembelian) {
-            $totalPurchase += $pembelian->total;
-            $amountPurchase += $pembelian->jumlah;
+            $totalPurchase += $pembelian->total_harga;
+            $amountPurchase += $pembelian->jumlah_pembelian;
         }
 
         // Hitung  HPP baru
         $hpp = $totalPurchase / $amountPurchase;
         // Cek produk
-        $checkProduk = Produk::where('id', $pembelianProduk->produk_id)->first();
+        $checkProduk = Produk::where('produk_id', $pembelianProduk->produk_id)->first();
 
         // Update stok produk dan COGS
-        $newAmount = $checkProduk->jumlah - $pembelianProduk->jumlah;
+        $newAmount = $checkProduk->jumlah_stok - $pembelianProduk->jumlah_pembelian;
 
         $checkProduk->update([
-            'jumlah' => $newAmount,
+            'jumlah_stok' => $newAmount,
             'hpp' => $hpp,
         ]);
 

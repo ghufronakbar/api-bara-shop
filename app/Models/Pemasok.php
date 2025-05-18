@@ -38,6 +38,6 @@ class Pemasok extends Model
 
     public function pembelian_produk()
     {
-        return $this->hasMany(PembelianProduk::class);
+        return $this->hasMany(PembelianProduk::class, 'pemasok_id', 'pemasok_id');
     }
 }

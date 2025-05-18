@@ -12,7 +12,6 @@ return new class extends Migration
             $table->uuid('log_aksi_id')->primary();
             $table->string('deskripsi_aksi');
             $table->json('detail_aksi');
-            $table->uuid('referensi_id');
             $table->string('model_referensi');
             $table->enum('jenis_aksi', ['Create', 'Update', 'Delete']);
 

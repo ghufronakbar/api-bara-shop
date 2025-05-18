@@ -43,11 +43,11 @@ class PembelianProduk extends Model
 
     public function produk()
     {
-        return $this->belongsTo(Produk::class);
+        return $this->belongsTo(Produk::class, 'produk_id', 'produk_id');
     }
 
     public function pemasok()
     {
-        return $this->belongsTo(Pemasok::class);
+        return $this->belongsTo(Pemasok::class, 'pemasok_id', 'pemasok_id');
     }
 }

@@ -24,13 +24,13 @@ class ProdukController extends Controller
     public function index()
     {
         $produk = Produk::where('is_deleted', false)
-            ->orderBy('nama', 'asc')
+            ->orderBy('nama_produk', 'asc')
             ->get();
 
         $item_pesanan = ItemPesanan::get();
 
         foreach ($produk as $p) {
-            $p->total_terjual = $item_pesanan->where('produk_id', $p->id)->sum('jumlah');
+            $p->total_terjual = $item_pesanan->where('produk_id', $p->produk_id)->sum('jumlah_barang');
         }
 
         return response()->json([
@@ -60,13 +60,13 @@ class ProdukController extends Controller
 
         // Membuat produk baru
         $produk = Produk::create([
-            'kategori' => $validated['kategori'],
-            'nama' => $validated['nama'],
-            'harga' => $validated['harga'],
-            'deskripsi' => $validated['deskripsi'],
+            'kategori_produk' => $validated['kategori'],
+            'nama_produk' => $validated['nama'],
+            'harga_produk' => $validated['harga'],
+            'deskripsi_produk' => $validated['deskripsi'],
             'hpp' => 0,
-            'jumlah' => 0,
-            'gambar' => $validated['gambar'] ?? null,
+            'jumlah_stok' => 0,
+            'foto_produk' => $validated['gambar'] ?? null,
             'is_deleted' => false,
         ]);
 
@@ -92,19 +92,19 @@ class ProdukController extends Controller
             ], 400);
         }
 
-        $produk = Produk::where('id', $id)->first();
+        $produk = Produk::where('produk_id', $id)->first();
 
         if (!$produk || $produk->is_deleted) {
             return response()->json([
                 'message' => 'Data tidak ditemukan'
             ], 404);
         }
-        $item_pesanan = ItemPesanan::where('produk_id', $produk->id)->get();
+        $item_pesanan = ItemPesanan::where('produk_id', $produk->produk_id)->get();
 
-        $produk->total_terjual = $item_pesanan->sum('jumlah');
+        $produk->total_terjual = $item_pesanan->sum('jumlah_barang');
         $produk->item_pesanan = $item_pesanan;
 
-        $pembelian = PembelianProduk::where('produk_id', $produk->id)->get();
+        $pembelian = PembelianProduk::where('produk_id', $produk->produk_id)->get();
         $produk->pembelian_produk = $pembelian;
 
         return response()->json([
@@ -131,7 +131,7 @@ class ProdukController extends Controller
             ], 400);
         }
 
-        $produk = Produk::where('id', $id)->select('id', 'is_deleted')->first();
+        $produk = Produk::where('produk_id', $id)->select('produk_id', 'is_deleted')->first();
 
         if (!$produk || $produk->is_deleted) {
             return response()->json([
@@ -142,11 +142,11 @@ class ProdukController extends Controller
         $validated = $validator->validated();
 
         $produk->update([
-            'kategori' => $validated['kategori'],
-            'nama' => $validated['nama'],
-            'harga' => $validated['harga'],
-            'deskripsi' => $validated['deskripsi'],
-            'gambar' => $validated['gambar'] ?? null,
+            'kategori_produk' => $validated['kategori'],
+            'nama_produk' => $validated['nama'],
+            'harga_produk' => $validated['harga'],
+            'deskripsi_produk' => $validated['deskripsi'],
+            'foto_produk' => $validated['gambar'] ?? null,
         ]);
 
         $this->logService->saveToLog($request, 'Produk', $produk->toArray());
@@ -170,7 +170,7 @@ class ProdukController extends Controller
             ], 400);
         }
 
-        $produk = Produk::where('id', $id)->first();
+        $produk = Produk::where('produk_id', $id)->first();
 
         if (!$produk || $produk->is_deleted) {
             return response()->json([

@@ -26,16 +26,16 @@ class PeranController extends Controller
     public function index()
     {
         $perans = Peran::where('is_deleted', false)
-            ->orderBy('nama', 'asc')
+            ->orderBy('nama_peran', 'asc')
             ->get();
 
         $users = User::where('is_deleted', false)
-            ->orderBy('nama', 'asc')
+            ->orderBy('nama_pengguna', 'asc')
             ->get()
-            ->keyBy('id');
+            ->keyBy('user_id');
 
         foreach ($perans as $peran) {
-            $peran->users = $users->where('peran_id', $peran->id)
+            $peran->users = $users->where('peran_id', $peran->peran_id)
                 ->values()
                 ->toArray();
         }
@@ -82,20 +82,22 @@ class PeranController extends Controller
 
         // Membuat peran baru
         $peran = Peran::create([
-            'nama' => $validated['nama'],
-            'ringkasan' => $validated['ringkasan'],
-            'laporan' => $validated['laporan'],
-            'informasi' => $validated['informasi'],
-            'kirim_pesan' => $validated['kirim_pesan'],
-            'pengguna' => $validated['pengguna'],
-            'peran' => $validated['peran'],
-            'pelanggan' => $validated['pelanggan'],
-            'produk' => $validated['produk'],
-            'pemasok' => $validated['pemasok'],
-            'riwayat_pesanan' => $validated['riwayat_pesanan'],
-            'pembelian' => $validated['pembelian'],
-            'cacat_produk' => $validated['cacat_produk'],
-            'kasir' => $validated['kasir'],
+            'nama_peran' => $validated['nama'],
+
+            'akses_ringkasan' => $validated['ringkasan'],
+            'akses_laporan' => $validated['laporan'],
+            'akses_informasi' => $validated['informasi'],
+            'akses_kirim_pesan' => $validated['kirim_pesan'],
+            'akses_pengguna' => $validated['pengguna'],
+            'akses_peran' => $validated['peran'],
+            'akses_pelanggan' => $validated['pelanggan'],
+            'akses_produk' => $validated['produk'],
+            'akses_pemasok' => $validated['pemasok'],
+            'akses_riwayat_pesanan' => $validated['riwayat_pesanan'],
+            'akses_pembelian' => $validated['pembelian'],
+            'akses_cacat_produk' => $validated['cacat_produk'],
+            'akses_kasir' => $validated['kasir'],
+
             'is_deleted' => false,
         ]);
 
@@ -126,7 +128,7 @@ class PeranController extends Controller
             ], 400);
         }
 
-        $peran = Peran::where('id', $id)
+        $peran = Peran::where('peran_id', $id)
             ->where('is_deleted', false)
             ->first();
 
@@ -137,8 +139,8 @@ class PeranController extends Controller
         }
 
         $users = User::where('is_deleted', false)
-            ->where('peran_id', $peran->id)
-            ->orderBy('nama', 'asc')
+            ->where('peran_id', $peran->peran_id)
+            ->orderBy('nama_pengguna', 'asc')
             ->get();
 
         $peran->users = $users;
@@ -183,7 +185,7 @@ class PeranController extends Controller
             ], 400);
         }
 
-        $peran = Peran::where('id', $id)->where('is_deleted', false)->first();
+        $peran = Peran::where('peran_id', $id)->where('is_deleted', false)->first();
 
         if (!$peran) {
             return response()->json([
@@ -194,20 +196,21 @@ class PeranController extends Controller
         $validated = $validator->validated();
 
         $peran->update([
-            'nama' => $validated['nama'],
-            'ringkasan' => $validated['ringkasan'],
-            'laporan' => $validated['laporan'],
-            'informasi' => $validated['informasi'],
-            'kirim_pesan' => $validated['kirim_pesan'],
-            'pengguna' => $validated['pengguna'],
-            'peran' => $validated['peran'],
-            'pelanggan' => $validated['pelanggan'],
-            'produk' => $validated['produk'],
-            'pemasok' => $validated['pemasok'],
-            'riwayat_pesanan' => $validated['riwayat_pesanan'],
-            'pembelian' => $validated['pembelian'],
-            'cacat_produk' => $validated['cacat_produk'],
-            'kasir' => $validated['kasir'],
+            'nama_peran' => $validated['nama'],
+
+            'akses_ringkasan' => $validated['ringkasan'],
+            'akses_laporan' => $validated['laporan'],
+            'akses_informasi' => $validated['informasi'],
+            'akses_kirim_pesan' => $validated['kirim_pesan'],
+            'akses_pengguna' => $validated['pengguna'],
+            'akses_peran' => $validated['peran'],
+            'akses_pelanggan' => $validated['pelanggan'],
+            'akses_produk' => $validated['produk'],
+            'akses_pemasok' => $validated['pemasok'],
+            'akses_riwayat_pesanan' => $validated['riwayat_pesanan'],
+            'akses_pembelian' => $validated['pembelian'],
+            'akses_cacat_produk' => $validated['cacat_produk'],
+            'akses_kasir' => $validated['kasir'],
         ]);
 
         $this->logService->saveToLog($request, 'Peran', $peran->toArray());
@@ -238,7 +241,7 @@ class PeranController extends Controller
             ], 400);
         }
 
-        $peran = Peran::where('id', $id)->where('is_deleted', false)->first();
+        $peran = Peran::where('peran_id', $id)->where('is_deleted', false)->first();
 
         if (!$peran) {
             return response()->json([

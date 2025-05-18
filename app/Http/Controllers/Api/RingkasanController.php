@@ -27,7 +27,7 @@ class RingkasanController extends Controller
         // Mengambil data pengeluaran per hari (total dari pembelian_produk)
         $pengeluaranData = PembelianProduk::select(
             DB::raw('DATE(created_at) as date'),
-            DB::raw('SUM(total) as pengeluaran')
+            DB::raw('SUM(total_harga) as pengeluaran')
         )
             ->where('is_deleted', false)
             ->groupBy(DB::raw('DATE(created_at)'))
@@ -36,9 +36,9 @@ class RingkasanController extends Controller
         // Mengambil total produk terjual per hari (jumlah dari item_pesanan.jumlah)
         $totalProdukTerjualData = ItemPesanan::select(
             DB::raw('DATE(item_pesanan.created_at) as date'),
-            DB::raw('SUM(item_pesanan.jumlah) as total_terjual')
+            DB::raw('SUM(item_pesanan.jumlah_barang) as total_terjual')
         )
-            ->join('pesanan', 'pesanan.id', '=', 'item_pesanan.pesanan_id')
+            ->join('pesanan', 'pesanan.pesanan_id', '=', 'item_pesanan.pesanan_id')
             ->where('item_pesanan.is_deleted', false)
             ->groupBy(DB::raw('DATE(item_pesanan.created_at)'))
             ->get();
@@ -46,7 +46,7 @@ class RingkasanController extends Controller
         // Mengambil total pembelian produk per hari (jumlah dari pembelian_produk.jumlah)
         $totalPembelianData = PembelianProduk::select(
             DB::raw('DATE(pembelian_produk.created_at) as date'),
-            DB::raw('SUM(pembelian_produk.jumlah) as total_pembelian')
+            DB::raw('SUM(pembelian_produk.jumlah_pembelian) as total_pembelian')
         )
             ->where('pembelian_produk.is_deleted', false)
             ->groupBy(DB::raw('DATE(pembelian_produk.created_at)'))
@@ -147,14 +147,14 @@ class RingkasanController extends Controller
     {
         $soldProducts = ItemPesanan::select(
             'produk_id',
-            DB::raw('MAX(produk.nama) as nama'),
-            DB::raw('MAX(produk.gambar) as gambar'),
-            DB::raw('SUM(item_pesanan.jumlah) as total_terjual')
+            DB::raw('MAX(produk.nama_produk) as nama'),
+            DB::raw('MAX(produk.foto_produk) as gambar'),
+            DB::raw('SUM(item_pesanan.jumlah_barang) as total_terjual')
         )
-            ->join('produk', 'produk.id', '=', 'item_pesanan.produk_id')
+            ->join('produk', 'produk.produk_id', '=', 'item_pesanan.produk_id')
             ->where('item_pesanan.is_deleted', false)
             ->groupBy('produk_id')
-            ->orderByDesc(DB::raw('SUM(item_pesanan.jumlah)'))
+            ->orderByDesc(DB::raw('SUM(item_pesanan.jumlah_barang)'))
             ->get();
 
         foreach ($soldProducts as $product) {

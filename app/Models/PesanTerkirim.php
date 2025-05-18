@@ -37,11 +37,11 @@ class PesanTerkirim extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
     public function pelanggan()
     {
-        return $this->belongsToMany(Pelanggan::class, 'pesan_pelanggan', 'pesan_terkirim_id', 'pelanggan_id');
+        return $this->belongsToMany(Pelanggan::class, 'pesan_terkirim_pelanggan', 'pesan_terkirim_id', 'pelanggan_id');
     }
 }

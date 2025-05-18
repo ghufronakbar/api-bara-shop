@@ -14,6 +14,7 @@ use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class PesanController extends Controller
 {
@@ -36,7 +37,7 @@ class PesanController extends Controller
         $user = User::get();
 
         foreach ($pesanTerkirim as $pesan) {
-            $pesan->user = $user->where('id', $pesan->user_id)->first();
+            $pesan->user = $user->where('user_id', $pesan->user_id)->first();
         }
 
         return response()->json([
@@ -72,7 +73,7 @@ class PesanController extends Controller
         try {
             $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
 
-            if (!$decoded->id) {
+            if (!$decoded->user_id) {
                 return response()->json(['message' => 'Unauthorized', 'errors' => 'Unauthorized'], 401);
             }
 
@@ -85,7 +86,7 @@ class PesanController extends Controller
                         'body_text' => $validated['pesan'],
                         'nama' => $pelanggan->nama
                     ];
-                    Mail::to($pelanggan->kode)->queue(new EmailKirimPesan($data));
+                    Mail::to($pelanggan->kode_pelanggan)->queue(new EmailKirimPesan($data));
                 }
             }
 
@@ -93,7 +94,7 @@ class PesanController extends Controller
                 return $pelanggan->jenis_kode == 'Phone';
             });
 
-            $phones = $pelangganWithPhone->pluck('kode')->toArray();
+            $phones = $pelangganWithPhone->pluck('kode_pelanggan')->toArray();
             $names = $pelangganWithPhone->pluck('nama')->toArray();
 
 
@@ -101,16 +102,21 @@ class PesanController extends Controller
             $whatsappController->sendBulkWhatsapp($phones, $names, $validated['subjek'], $validated['pesan']);
 
             $pesanTerkirim = PesanTerkirim::create([
-                'subjek' => $validated['subjek'],
-                'pesan' => $validated['pesan'],
-                'user_id' => $decoded->id
+                'subjek_pesan' => $validated['subjek'],
+                'isi_pesan' => $validated['pesan'],
+                'user_id' => $decoded->user_id
             ]);
 
             // Daftar ID pelanggan yang ingin dikaitkan dengan pesan terkirim
-            $pelangganIds = $pelanggans->pluck('id')->toArray();
+            $pelangganIds = $pelanggans->pluck('pelanggan_id')->toArray();
 
             // Mengaitkan pelanggan dengan pesan terkirim
-            $pesanTerkirim->pelanggan()->attach($pelangganIds);
+            foreach ($pelangganIds as $pelangganId) {
+                $uuid = Str::uuid();
+                $pesanTerkirim->pelanggan()->attach($pelangganId, [
+                    'pesan_terkirim_pelanggan_id' => $uuid
+                ]);
+            }
 
             $this->logService->saveToLog($request, 'PesanTerkirim', $pesanTerkirim->toArray());
 
@@ -137,9 +143,9 @@ class PesanController extends Controller
             ], 400);
         }
 
-        $pesanTerkirim = PesanTerkirim::withCount(["pelanggan"])->where('id', $id)->first();
+        $pesanTerkirim = PesanTerkirim::withCount(["pelanggan"])->where('pesan_terkirim_id', $id)->first();
 
-        $user = User::where('id', $pesanTerkirim->user_id)->first();
+        $user = User::where('user_id', $pesanTerkirim->user_id)->first();
 
         $pesanTerkirim->user = $user;
 

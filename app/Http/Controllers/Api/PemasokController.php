@@ -24,7 +24,7 @@ class PemasokController extends Controller
     {
         $pemasok = Pemasok::withCount([])
             ->where('is_deleted', false)
-            ->orderBy('nama', 'asc')
+            ->orderBy('nama_pemasok', 'asc')
             ->get();
 
         return response()->json([
@@ -52,10 +52,10 @@ class PemasokController extends Controller
         $validated = $validator->validated();
 
         $pemasok = Pemasok::create([
-            'nama' => $validated['nama'],
-            'alamat' => $validated['alamat'],
-            'telepon' => $validated['telepon'],
-            'gambar' => $validated['gambar'] ?? null,
+            'nama_pemasok' => $validated['nama'],
+            'alamat_pemasok' => $validated['alamat'],
+            'telepon_pemasok' => $validated['telepon'],
+            'logo_pemasok' => $validated['gambar'] ?? null,
             'is_deleted' => false,
         ]);
 
@@ -81,7 +81,7 @@ class PemasokController extends Controller
             ], 400);
         }
 
-        $pemasok = Pemasok::where('id', $id)->first();
+        $pemasok = Pemasok::where('pemasok_id', $id)->first();
 
         if (!$pemasok || $pemasok->is_deleted) {
             return response()->json([
@@ -115,7 +115,7 @@ class PemasokController extends Controller
             ], 400);
         }
 
-        $pemasok = Pemasok::where('id', $id)->select('id', 'is_deleted')->first();
+        $pemasok = Pemasok::where('pemasok_id', $id)->select('pemasok_id', 'is_deleted')->first();
 
         if (!$pemasok || $pemasok->is_deleted) {
             return response()->json([
@@ -126,10 +126,10 @@ class PemasokController extends Controller
         $validated = $validator->validated();
 
         $pemasok->update([
-            'nama' => $validated['nama'],
-            'alamat' => $validated['alamat'],
-            'telepon' => $validated['telepon'],
-            'gambar' => $validated['gambar'] ?? null,
+            'nama_pemasok' => $validated['nama'],
+            'alamat_pemasok' => $validated['alamat'],
+            'telepon_pemasok' => $validated['telepon'],
+            'logo_pemasok' => $validated['gambar'] ?? null,
         ]);
 
         $this->logService->saveToLog($request, 'Pemasok', $pemasok->toArray());
@@ -153,7 +153,7 @@ class PemasokController extends Controller
             ], 400);
         }
 
-        $pemasok = Pemasok::where('id', $id)->first();
+        $pemasok = Pemasok::where('pemasok_id', $id)->first();
 
         if (!$pemasok || $pemasok->is_deleted) {
             return response()->json([

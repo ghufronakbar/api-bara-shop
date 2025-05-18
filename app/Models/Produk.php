@@ -43,6 +43,6 @@ class Produk extends Model
 
     public function item_pesanan()
     {
-        return $this->hasMany(ItemPesanan::class);
+        return $this->hasMany(ItemPesanan::class, 'produk_id', 'produk_id');
     }
 }
